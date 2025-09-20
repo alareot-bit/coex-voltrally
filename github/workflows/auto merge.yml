@@ -1,0 +1,29 @@
+name: Auto Merge (labels)
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, labeled, ready_for_review]
+  check_suite:
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+  statuses: read
+
+jobs:
+  automerge:
+    if: github.event.pull_request != null
+    runs-on: ubuntu-latest
+    steps:
+      - name: Merge when CI is green and label is 'automerge'
+        uses: peter-evans/auto-merge@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          merge-method: squash
+          commit-message: pull-request-title
+          required-labels: automerge
+          # 按需：不要求人工审核
+          require-review-approval: false
+          # 当 CI 还在跑时会等待
+          merge-until-stable: true
