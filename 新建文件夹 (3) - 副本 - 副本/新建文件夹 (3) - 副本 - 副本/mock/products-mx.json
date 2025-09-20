@@ -1,0 +1,407 @@
+{
+    "products": [
+        {
+            "id": "CT400",
+            "sku": "CT400",
+            "name": "Cargo Trike 400kg",
+            "category": "3-wheel",
+            "subcategory": "express",
+            "image": "/占位图/ee1e5ca380e04272ce692251ad54cb67.jpg",
+            "specs": "72V 45Ah • 40 km/h • 80-90 km",
+            "description": "Heavy-duty electric cargo trike for express delivery",
+            "pricing": {
+                "solo": 3149,
+                "group": 2649,
+                "currency": "USD",
+                "symbol": "$",
+                "saving": 500
+            },
+            "batch": {
+                "id": "MX-203",
+                "target": 36,
+                "joined": 32,
+                "need": 4,
+                "progress": 89,
+                "eligibleForGroup": true
+            },
+            "badges": ["HOT"],
+            "inStock": true,
+            "featured": true,
+            "parameters": {
+                "motor": "3000W BLDC",
+                "battery": "72V 45Ah LiFePO4",
+                "speed": "40 km/h",
+                "range": "80-90 km",
+                "payload": "400 kg",
+                "dimensions": "3200×1200×1800mm",
+                "weight": "320 kg",
+                "certification": "UN38.3, CE, MSDS"
+            }
+        },
+        {
+            "id": "DS250",
+            "sku": "DS250",
+            "name": "Delivery Scooter 250kg",
+            "category": "2-wheel",
+            "subcategory": "delivery",
+            "image": "/占位图/2d4a4baf2205a10a4e9ef910f670bc03.jpg",
+            "specs": "60V 32Ah • 45 km/h • 65 km",
+            "description": "Efficient electric scooter for urban delivery",
+            "pricing": {
+                "solo": 2249,
+                "group": 1899,
+                "currency": "USD",
+                "symbol": "$",
+                "saving": 350
+            },
+            "batch": {
+                "id": "MX-203",
+                "target": 36,
+                "joined": 18,
+                "need": 18,
+                "progress": 50,
+                "eligibleForGroup": true
+            },
+            "badges": [],
+            "inStock": true,
+            "featured": true,
+            "parameters": {
+                "motor": "2000W Hub Motor",
+                "battery": "60V 32Ah Lithium",
+                "speed": "45 km/h",
+                "range": "65 km",
+                "payload": "250 kg",
+                "dimensions": "2100×750×1200mm",
+                "weight": "125 kg",
+                "certification": "UN38.3, CE"
+            }
+        },
+        {
+            "id": "EB2000",
+            "sku": "EB2000",
+            "name": "Electric Bike 2000W",
+            "category": "2-wheel",
+            "subcategory": "sport",
+            "image": "/占位图/353f0546ff63e3d046d39982af457400.jpg",
+            "specs": "72V 20Ah • 55 km/h • 100 km",
+            "description": "High-performance electric sport bike",
+            "pricing": {
+                "solo": 1499,
+                "group": 1299,
+                "currency": "USD",
+                "symbol": "$",
+                "saving": 200
+            },
+            "batch": {
+                "id": "MX-203",
+                "target": 36,
+                "joined": 25,
+                "need": 11,
+                "progress": 69,
+                "eligibleForGroup": true
+            },
+            "badges": ["NEW"],
+            "inStock": true,
+            "featured": true,
+            "parameters": {
+                "motor": "2000W Mid-drive",
+                "battery": "72V 20Ah LiFePO4",
+                "speed": "55 km/h",
+                "range": "100 km",
+                "payload": "150 kg",
+                "dimensions": "1950×680×1100mm",
+                "weight": "75 kg",
+                "certification": "UN38.3, CE"
+            }
+        },
+        {
+            "id": "LFP72",
+            "sku": "LFP72",
+            "name": "LiFePO4 Battery 72V 45Ah",
+            "category": "batteries",
+            "subcategory": "lfp",
+            "image": "/占位图/7cc6023a570f7333d44682ffcc6ea793.jpg",
+            "specs": "BMS 100A • 5000 cycles • UN38.3",
+            "description": "Premium LiFePO4 battery pack with smart BMS",
+            "pricing": {
+                "solo": 799,
+                "group": 649,
+                "currency": "USD",
+                "symbol": "$",
+                "saving": 150
+            },
+            "batch": {
+                "id": "MX-203",
+                "target": 78,
+                "joined": 42,
+                "need": 36,
+                "progress": 54,
+                "eligibleForGroup": true
+            },
+            "badges": [],
+            "inStock": true,
+            "featured": true,
+            "parameters": {
+                "type": "LiFePO4",
+                "voltage": "72V",
+                "capacity": "45Ah",
+                "energy": "3240Wh",
+                "bms": "100A Smart BMS",
+                "cycles": "5000+",
+                "dimensions": "420×220×180mm",
+                "weight": "28 kg",
+                "certification": "UN38.3, MSDS"
+            }
+        },
+        {
+            "id": "MT350",
+            "sku": "MT350",
+            "name": "Mountain E-Bike 350W",
+            "category": "2-wheel",
+            "subcategory": "sport",
+            "image": "/占位图/9e54cbf48291ce4bd5060a6f3643cae7.jpg",
+            "specs": "48V 15Ah • 35 km/h • 60 km",
+            "description": "All-terrain electric mountain bike",
+            "pricing": {
+                "solo": 1099,
+                "group": 899,
+                "currency": "USD",
+                "symbol": "$",
+                "saving": 200
+            },
+            "batch": {
+                "id": "MX-203",
+                "target": 36,
+                "joined": 15,
+                "need": 21,
+                "progress": 42,
+                "eligibleForGroup": true
+            },
+            "badges": [],
+            "inStock": true,
+            "featured": true,
+            "parameters": {
+                "motor": "350W Bafang",
+                "battery": "48V 15Ah",
+                "speed": "35 km/h",
+                "range": "60 km",
+                "gears": "21 Speed Shimano",
+                "dimensions": "1850×650×1100mm",
+                "weight": "32 kg",
+                "certification": "CE"
+            }
+        },
+        {
+            "id": "CS500",
+            "sku": "CS500",
+            "name": "City Scooter 500W",
+            "category": "2-wheel",
+            "subcategory": "city",
+            "image": "/占位图/aafee54c0eb64305765b0b15e1daeeee.jpg",
+            "specs": "48V 12Ah • 25 km/h • 40 km",
+            "description": "Compact city commuter electric scooter",
+            "pricing": {
+                "solo": 699,
+                "group": 599,
+                "currency": "USD",
+                "symbol": "$",
+                "saving": 100
+            },
+            "batch": {
+                "id": "MX-203",
+                "target": 36,
+                "joined": 33,
+                "need": 3,
+                "progress": 92,
+                "eligibleForGroup": true
+            },
+            "badges": ["-15%"],
+            "inStock": true,
+            "featured": true,
+            "parameters": {
+                "motor": "500W Hub Motor",
+                "battery": "48V 12Ah",
+                "speed": "25 km/h",
+                "range": "40 km",
+                "brakes": "Disc + E-brake",
+                "dimensions": "1180×580×1200mm",
+                "weight": "22 kg",
+                "certification": "CE"
+            }
+        },
+        {
+            "id": "HD600",
+            "sku": "HD600",
+            "name": "Heavy Duty Loader 600kg",
+            "category": "3-wheel",
+            "subcategory": "dump",
+            "image": "/占位图/ad37d8702b67fb226405c3da0bd8d517.jpg",
+            "specs": "72V 60Ah • 35 km/h • 70 km",
+            "description": "Electric dump truck for construction",
+            "pricing": {
+                "solo": 4299,
+                "group": 3699,
+                "currency": "USD",
+                "symbol": "$",
+                "saving": 600
+            },
+            "batch": {
+                "id": "MX-204",
+                "target": 36,
+                "joined": 8,
+                "need": 28,
+                "progress": 22,
+                "eligibleForGroup": true
+            },
+            "badges": [],
+            "inStock": true,
+            "featured": false
+        },
+        {
+            "id": "EX300",
+            "sku": "EX300",
+            "name": "Express Van E300",
+            "category": "3-wheel",
+            "subcategory": "express",
+            "image": "/占位图/adc231adbe19445b6854e72373b3906f.jpg",
+            "specs": "60V 45Ah • 45 km/h • 85 km",
+            "description": "Enclosed cargo van for express delivery",
+            "pricing": {
+                "solo": 3599,
+                "group": 2999,
+                "currency": "USD",
+                "symbol": "$",
+                "saving": 600
+            },
+            "batch": {
+                "id": "MX-203",
+                "target": 36,
+                "joined": 20,
+                "need": 16,
+                "progress": 56,
+                "eligibleForGroup": true
+            },
+            "badges": [],
+            "inStock": true,
+            "featured": false
+        },
+        {
+            "id": "SP2500",
+            "sku": "SP2500",
+            "name": "Sport Bike 2500W",
+            "category": "2-wheel",
+            "subcategory": "sport",
+            "image": "/占位图/c3fb7432dab462c670effe9827b04bd8.jpg",
+            "specs": "72V 30Ah • 65 km/h • 120 km",
+            "description": "Premium electric sport motorcycle",
+            "pricing": {
+                "solo": 2199,
+                "group": 1799,
+                "currency": "USD",
+                "symbol": "$",
+                "saving": 400
+            },
+            "batch": {
+                "id": "MX-203",
+                "target": 36,
+                "joined": 12,
+                "need": 24,
+                "progress": 33,
+                "eligibleForGroup": true
+            },
+            "badges": ["HOT"],
+            "inStock": true,
+            "featured": false
+        },
+        {
+            "id": "LI60",
+            "sku": "LI60",
+            "name": "Lithium Battery 60V 32Ah",
+            "category": "batteries",
+            "subcategory": "lithium",
+            "image": "/占位图/cc170b9bc7b1f5a6a44047db5cc36214.jpg",
+            "specs": "BMS 80A • 3000 cycles • Compact",
+            "description": "High-density lithium battery pack",
+            "pricing": {
+                "solo": 599,
+                "group": 499,
+                "currency": "USD",
+                "symbol": "$",
+                "saving": 100
+            },
+            "batch": {
+                "id": "MX-203",
+                "target": 78,
+                "joined": 55,
+                "need": 23,
+                "progress": 71,
+                "eligibleForGroup": true
+            },
+            "badges": [],
+            "inStock": true,
+            "featured": false
+        },
+        {
+            "id": "MC3000",
+            "sku": "MC3000",
+            "name": "Motor Controller 3000W",
+            "category": "parts",
+            "subcategory": "controllers",
+            "image": "/占位图/d9cfef77ec73a8c0564523fd95034df5.jpg",
+            "specs": "72V • 50A • Programmable",
+            "description": "Smart motor controller with app control",
+            "pricing": {
+                "solo": 189,
+                "group": 149,
+                "currency": "USD",
+                "symbol": "$",
+                "saving": 40
+            },
+            "batch": {
+                "id": "MX-203",
+                "target": 78,
+                "joined": 45,
+                "need": 33,
+                "progress": 58,
+                "eligibleForGroup": true
+            },
+            "badges": [],
+            "inStock": true,
+            "featured": false
+        },
+        {
+            "id": "FB350",
+            "sku": "FB350",
+            "name": "Flatbed Cargo 350kg",
+            "category": "3-wheel",
+            "subcategory": "flatbed",
+            "image": "/占位图/09718e1c15b9ecb9e90d4863608f3f0a.jpg",
+            "specs": "60V 40Ah • 40 km/h • 75 km",
+            "description": "Open flatbed for flexible cargo loading",
+            "pricing": {
+                "solo": 2799,
+                "group": 2399,
+                "currency": "USD",
+                "symbol": "$",
+                "saving": 400
+            },
+            "batch": {
+                "id": "MX-203",
+                "target": 36,
+                "joined": 24,
+                "need": 12,
+                "progress": 67,
+                "eligibleForGroup": true
+            },
+            "badges": [],
+            "inStock": true,
+            "featured": false
+        }
+    ],
+    "meta": {
+        "total": 56,
+        "page": 1,
+        "perPage": 12,
+        "hasMore": true
+    }
+}

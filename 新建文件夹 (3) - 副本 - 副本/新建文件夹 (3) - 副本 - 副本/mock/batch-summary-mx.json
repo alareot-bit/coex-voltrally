@@ -1,0 +1,50 @@
+{
+    "current": {
+        "id": "MX-203",
+        "country": "MX",
+        "container": "20GP",
+        "seats": 36,
+        "joined": 28,
+        "status": "open",
+        "openAt": "2025-09-01T00:00:00Z",
+        "lockAt": "2025-09-24T16:00:00Z",
+        "shipAt": "2025-09-27T08:00:00Z",
+        "arriveAt": "2025-10-15T12:00:00Z",
+        "port": "Manzanillo",
+        "avgSavingPerUnit": 600,
+        "totalCommunitySaved": 487290,
+        "progress": 78,
+        "needMore": 8
+    },
+    "batches": {
+        "MX-203": {
+            "id": "MX-203",
+            "status": "open",
+            "progress": 78,
+            "seats": 36,
+            "joined": 28
+        },
+        "MX-204": {
+            "id": "MX-204",
+            "status": "upcoming",
+            "progress": 0,
+            "seats": 36,
+            "joined": 0,
+            "openAt": "2025-09-25T00:00:00Z"
+        },
+        "MX-202": {
+            "id": "MX-202",
+            "status": "shipped",
+            "progress": 100,
+            "seats": 36,
+            "joined": 36,
+            "trackingNumber": "MAEU123456789"
+        }
+    },
+    "stats": {
+        "totalBatches": 202,
+        "successfulShipments": 142,
+        "averageFillRate": 92,
+        "averageTimeToFill": 12
+    }
+}

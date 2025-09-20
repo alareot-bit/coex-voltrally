@@ -1,0 +1,157 @@
+
+
+VoltRally — 产品列表页 补充规范 v1.1（在 v1.0 基础上深化）
+
+目标：让前端一次性把“列表页”做成可交互、可自检、可切国家/币种、可扩类目的成品页；避免任何“静态卡片演示”。
+
+A. 卡片（Card）信息与布局强约束
+	•	信息层级：
+	1.	名称（单行省略）
+	2.	一行次级规格（例：72V 60Ah · 40 km/h · 80 km，按类目动态拼接）
+	3.	价格区：并排展示
+	•	Group：<strong data-price-group>；右侧小胶囊 Save $X（文本，不用图标）
+	•	Solo：<span data-price-solo>（可选划线 <s> 表示 MSRP 或普通零售）
+	4.	进度区（仅 groupEligible）：<meter> or <div role="progressbar"> + “Joined X / Target Y · Need N more”
+	5.	按钮区：Join Group（主色） / Buy Solo（次级） / Details（文本按钮）
+	6.	工具：对比复选框、收藏（心形改为文本按钮“Save”）
+	•	响应式：
+	•	移动：整卡宽 100%，按钮 两列（Join=整行 / 其它半宽并排）。
+	•	桌面：价格区横排；按钮三并排。
+	•	键盘：卡片容器 tabindex="0"；Enter 触发 Join Group；空格切换“对比”复选框。
+	•	占位与失败：图片失败 → 灰底块 + 产品名首字母；价格缺失 → “Contact for price”。
+
+B. 筛选（Filters）控件细化
+	•	区间型（price/speed/range/payload）：双滑块 + 手动输入；单位随类目切换（km/h、km、kg）；失焦自校验并回写 URL。
+	•	多选型（voltage/sub）：checkbox；勾选即更新 URL（去抖 300ms）。
+	•	“仅看可团”：group=only；“排除可团”：exclude。
+	•	清空：只保留 cat 与 locale；滚动回到顶部工具条下 16px。
+
+C. 对比（Compare）规范
+	•	位置：页面右下吸底栏（移动端全宽；桌面端右下固定 320px 宽）。
+	•	数量：最多 3 个；超限时弹出提示“最多选择 3 项进行对比”。
+	•	打开方式：点击“Compare (N)”按钮 → 进入顶部覆盖层（桌面）/ 全屏弹层（移动）。
+	•	对比表字段（列顺序固定）：
+	1.	名称（带 SKU）
+	2.	核心规格（按类目：3W=Voltage/Capacity/Speed/Range/Payload；2W=Voltage/Capacity/Speed/Range；Batteries=Voltage/Capacity/Max Discharge；Parts=兼容性/功率等）
+	3.	Group 价 / Solo 价（当前币种）
+	4.	Progress（Joined/Target + Need）
+	5.	行为（Join / Solo / Details）
+	•	数据源：GET /api/catalog/compare?skus=...（见 v1.0 §8.3），不可用项置灰并显示原因。
+
+D. 快速查看（Quick View）规范
+	•	触发：卡片图片或“Details”旁的“Quick View”。
+	•	内容：左侧 1 张大图；右侧名、规格、Group/Solo 价格、进度条、按钮（Join/Solo/Go to Details）。
+	•	关闭：ESC / 点击遮罩 / 关闭按钮；保留列表滚动位置。
+
+E. 收藏（本地）与状态同步
+	•	收藏仅本地：localStorage.favorites = [sku...]；卡片“Save/Unsave”切换；对比层也显示收藏星号（文本“Saved”）。
+	•	顶部“Orders/Sign In”右侧新增“Saved (N)”入口 → 跳 /account/favorites.html（后端未就绪前可用本地列表聚合）。
+
+F. 空态 / 错误 / 骨架屏
+	•	骨架：首次进入渲染9 张卡片骨架 + 筛选骨架；加载下一页只显示卡片骨架。
+	•	空态（0 结果）：
+	•	主文案：“No products match your filters”
+	•	快捷：Clear Filters + “回上级类目 / 回首页”
+	•	推荐：请求 /api/catalog/suggestions?cat=... 渲染 4 张推荐卡（不受当前筛选限制）。
+	•	错误：请求失败 → 错误组件（错误码 + “Retry”）；连续 3 次失败自动切到 /mock。
+
+G. URL 与状态（保证可分享/可刷新）
+	•	所有控件变更 → 更新 QueryString（history.replaceState），不刷新；用户按 F5 后必须还原。
+	•	返回列表：从详情页返回时读 sessionStorage.catalogScrollTop 恢复滚动位置。
+	•	对比勾选状态同步到 compare=，收藏不同步（仅本地）。
+
+H. 性能与预算
+	•	FCP（移动中档机）< 2.5s；LCP < 3.5s；可懒加载非首屏列表。
+	•	图片懒加载阈值 200px，srcset 提供 320/640/960。
+	•	接口缓存：相同 Query 60s 内命中内存缓存；切国家/币种必须强制刷新。
+	•	DOM 分页：每屏 ≤ 48 卡（分页或虚拟滚动二选一；优先分页）。
+
+I. 可访问性（A11y）
+	•	滑块有可读 aria 标注：aria-valuemin/max/now，单位文本放在 aria-describedby。
+	•	进度条使用 <meter> 或 role="progressbar" 并暴露 valuenow/valuemax。
+	•	所有交互按钮有明确 aria-label（如“Join group for ”）。
+	•	颜色对比度 ≥ 4.5:1；键盘可达；焦点样式明显。
+
+J. Mock 数据与生成要求（每类目至少 6 条）
+
+Claude 必须落库到 /mock：
+	•	catalog-3w.json / catalog-2w.json / catalog-batt.json / catalog-parts.json（各 ≥ 24 条，首屏展示取其中 6 条）。
+	•	示例结构（精简 2 条，实际请扩充为 ≥24 条）：
+
+{
+  "items": [
+    {
+      "id": "CT400-MX-72V60-40-80",
+      "name": "CT400 Delivery Box Tricycle",
+      "thumb": "/assets/img/ct400-1.webp",
+      "specs": { "v": "72V", "ah": "60Ah", "speed": 40, "range": 80, "payloadKg": 400 },
+      "soloPrice": 4580,
+      "groupPrice": 3980,
+      "currency": "USD",
+      "groupEligible": true,
+      "joined": 28,
+      "target": 36,
+      "country": "MX",
+      "tags": ["delivery"]
+    },
+    {
+      "id": "CT600-MX-72V80-45-90",
+      "name": "CT600 Heavy Duty Delivery",
+      "thumb": "/assets/img/ct600-1.webp",
+      "specs": { "v": "72V", "ah": "80Ah", "speed": 45, "range": 90, "payloadKg": 600 },
+      "soloPrice": 6290,
+      "groupPrice": 5490,
+      "currency": "USD",
+      "groupEligible": true,
+      "joined": 12,
+      "target": 36,
+      "country": "MX",
+      "tags": ["flatbed"]
+    }
+  ],
+  "page": 1,
+  "per": 24,
+  "total": 137,
+  "hasMore": true
+}
+
+生成约束
+	•	3W/2W/Batteries/Parts 各自字段差异要真实（Batteries 没有 speed/range/payload，但有 maxDischargeA 等）。
+	•	不同 SKU 的 target 要体现“每款可设不同箱规”（36/48/60 等）。
+	•	为 MX/CO/EG 至少各给 6 条能售卖的 item（country 字段）。
+
+K. 接口契约（补充）
+	•	GET /api/catalog/suggestions?cat=3w&country=MX&currency=USD
+→ 返回结构与 list 相同，但无需 facets 受限。
+	•	POST /api/analytics 埋点事件追加：
+	•	catalog_quickview_open { sku }
+	•	catalog_compare_open { skus }
+	•	catalog_favorite_toggle { sku, saved }
+
+L. 统一令牌/样式（不可省略）
+	•	不新增颜色；沿用 tokens（示例）：
+	•	--bg: #0f1114、--panel: #15181d、--text: #e7ebf0、--muted: #8b96a8、--accent: #f3c24b、--danger: #ff5c5c
+	•	间距：--gap-1: 4px / --gap-2: 8px / --gap-3: 12px / --gap-4: 16px / --gap-6: 24px
+	•	圆角：卡片 12px，按钮 10px
+	•	进度条：背景 #2a2f36、填充 --accent，高度 8px，圆角 8px。
+
+M. 自检脚本与输出要求（Claude 必须产出）
+	•	在 src/tools/self-check.js 写入自检（运行于浏览器 Console）：
+	1.	校验 DOM 是否存在 #filters/#list/#pagination/#compare-dock；
+	2.	校验 URL 与 UI 一致（取样：sort/per/price/voltage）
+	3.	校验首屏卡片 ≥ 6，且每张卡都有 Solo & Group 价格与按钮
+	4.	校验 localStorage.favorites 与对比栏同步
+	5.	打印汇总报告到 reports/overview.md（时间戳、接口耗时、缓存命中、错误次数）
+	•	交付新增：
+	•	/mock/*.json 四个大类（各 ≥ 24）
+	•	reports/overview.md 与 debug-report.md
+
+N. 验收清单（增量）
+	•	✅ 切国家/语言/币种后：价格、货币符号、价格筛选区间全部刷新。
+	•	✅ 移动端 1 列、桌面默认 3 列；每类首屏至少渲染 6 张卡。
+	•	✅ 卡片并排展示 Group/Solo；不可团时隐藏进度条但保留 Solo 购买与详情。
+	•	✅ URL 可分享/可刷新；返回能恢复滚动。
+	•	✅ 对比最多 3；收藏本地持久化；Quick View 有效。
+	•	✅ 空态有建议；错误有重试且回退 mock。
+	•	✅ 提交 reports/overview.md 的自检结果（含 Lighthouse 分数截图或数据）。
+

@@ -1,0 +1,88 @@
+{
+    "country": "MX",
+    "language": "EN",
+    "currency": "USD",
+    "categories": [
+        {
+            "id": "featured",
+            "name": "Featured",
+            "slug": "featured",
+            "description": "Best sellers and hot deals",
+            "productCount": 24
+        },
+        {
+            "id": "3-wheel",
+            "name": "3-Wheel Cargo",
+            "slug": "3-wheel",
+            "description": "Heavy-duty electric cargo trikes for commercial use",
+            "productCount": 36,
+            "subcategories": [
+                { "id": "express", "name": "Express Delivery" },
+                { "id": "dump", "name": "Dump Trucks" },
+                { "id": "flatbed", "name": "Flatbed Cargo" }
+            ]
+        },
+        {
+            "id": "2-wheel",
+            "name": "2-Wheel Electric",
+            "slug": "2-wheel",
+            "description": "Electric motorcycles and scooters",
+            "productCount": 42,
+            "subcategories": [
+                { "id": "city", "name": "City Scooters" },
+                { "id": "sport", "name": "Sport Bikes" },
+                { "id": "delivery", "name": "Delivery Scooters" }
+            ]
+        },
+        {
+            "id": "batteries",
+            "name": "Batteries",
+            "slug": "batteries",
+            "description": "LiFePO4 and Lithium-ion battery packs",
+            "productCount": 28,
+            "subcategories": [
+                { "id": "lfp", "name": "LiFePO4" },
+                { "id": "lithium", "name": "Lithium-ion" },
+                { "id": "portable", "name": "Portable Packs" }
+            ]
+        },
+        {
+            "id": "parts",
+            "name": "Parts & Accessories",
+            "slug": "parts",
+            "description": "Motors, controllers, and upgrade parts",
+            "productCount": 56,
+            "subcategories": [
+                { "id": "motors", "name": "Motors" },
+                { "id": "controllers", "name": "Controllers" },
+                { "id": "displays", "name": "Displays" },
+                { "id": "chargers", "name": "Chargers" }
+            ]
+        }
+    ],
+    "hero": {
+        "title": "Factory-direct. Crowd-powered.",
+        "subtitle": "Join thousands saving on electric vehicles through group shipping to Mexico",
+        "backgroundImage": null,
+        "ctaPrimary": "Join Now",
+        "ctaSecondary": "Learn More"
+    },
+    "stats": {
+        "totalSaved": 487290,
+        "successfulShipments": 142,
+        "happyMembers": 3847,
+        "averageSaving": 35
+    },
+    "defaultPort": "Manzanillo",
+    "shippingPorts": [
+        { "id": "manzanillo", "name": "Manzanillo", "state": "Colima" },
+        { "id": "veracruz", "name": "Veracruz", "state": "Veracruz" },
+        { "id": "altamira", "name": "Altamira", "state": "Tamaulipas" }
+    ],
+    "taxInfo": {
+        "field": "RFC",
+        "required": true,
+        "format": "XXX000000XXX",
+        "description": "Mexican Tax ID (RFC)"
+    }
+}

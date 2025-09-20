@@ -1,0 +1,157 @@
+
+	•	要做到你说的“2轮/3轮/电池/配件 + 可后台新增一级/二级分类”且前台自动生效，需要把“分类体系（taxonomy）”做成动态数据驱动。下面我把“如何落地”一次性给到 Cloud Code，照做即可，不用重做视觉。
+
+⸻
+
+一、我们现在就补齐的范围（做到“完整可用”的差距清单）
+	1.	动态分类导航（顶栏 + 吸顶筛选 Chips）
+	2.	分类落地页（Category Landing）+ 二级分类分区（Subcategory Anchors）
+	3.	产品列表接口联动（按类目/二级类目拉取、分页、排序、筛选）
+	4.	面包屑/回到分类（详情页）
+	5.	后台新增/改名/上下线分类后，前台自动更新（无需发版）
+	6.	SEO 友好 URL & i18n 文案
+	7.	容错（空分类、跨国别可见性、同一产品多类目等）
+
+以上全部在不改你已有黑金视觉的前提下完成：我们只加 data-* 钩子与渲染逻辑。
+
+⸻
+
+二、数据模型（前后端对齐）
+
+1) 分类数据（一级/二级）
+
+{
+  "categories": [
+    {
+      "id": "cat_3w",
+      "slug": "3-wheel-cargo",
+      "name": {"en":"3-Wheel Cargo","es":"Triciclos de carga"},
+      "icon": "icon-3w",                  // 可选：前台图标类名
+      "hero": "/assets/img/cat-3w.webp",   // 可选：类目横幅
+      "visibleCountries": ["MX","CO","EG","NG","ID","PH"], // 可空=全局
+      "children": [
+        {"id":"sub_3w_delivery","slug":"delivery","name":{"en":"Delivery Box"}},
+        {"id":"sub_3w_dump","slug":"dump","name":{"en":"Dump Bed"}},
+        {"id":"sub_3w_flatbed","slug":"flatbed","name":{"en":"Flatbed"}}
+      ]
+    },
+    {
+      "id": "cat_2w",
+      "slug": "2-wheel-electric",
+      "name": {"en":"2-Wheel Electric"},
+      "children":[
+        {"id":"sub_2w_city","slug":"city","name":{"en":"City"}},
+        {"id":"sub_2w_cargo","slug":"cargo","name":{"en":"Cargo"}},
+        {"id":"sub_2w_sport","slug":"sport","name":{"en":"Sport"}}
+      ]
+    },
+    {
+      "id": "cat_batt",
+      "slug": "batteries",
+      "name": {"en":"Batteries"},
+      "children":[
+        {"id":"sub_batt_lfp72","slug":"lfp-72v","name":{"en":"LFP 72V"}},
+        {"id":"sub_batt_lfp60","slug":"lfp-60v","name":{"en":"LFP 60V"}}
+      ]
+    },
+    {
+      "id": "cat_parts",
+      "slug": "parts",
+      "name": {"en":"Parts & Accessories"},
+      "children":[
+        {"id":"sub_parts_motor","slug":"motor","name":{"en":"Motors"}},
+        {"id":"sub_parts_controller","slug":"controller","name":{"en":"Controllers"}},
+        {"id":"sub_parts_charger","slug":"charger","name":{"en":"Chargers"}}
+      ]
+    }
+  ],
+  "updatedAt":"2025-09-06T08:00:00Z"
+}
+
+接口：GET /api/categories?country=MX&lang=en
+	•	后台新增/改名/隐藏类目，只要返回这份 JSON，前台即刻更新。
+
+2) 产品查询（按类目/二级类目）
+
+GET /api/products?country=MX&lang=en&category=cat_3w&subcategory=sub_3w_delivery&page=1&pageSize=12&sort=popular
+
+返回字段沿用你现有的卡片模型（标题、规格Tag、价格、Group/ Solo、Joined/Target 等）。
+
+⸻
+
+三、路由 & URL 规则（SEO + 多语言）
+	•	一级类目页：/{country}/{lang}/{categorySlug}
+例：/mx/en/3-wheel-cargo
+	•	二级类目页：/{country}/{lang}/{categorySlug}/{subSlug}
+例：/mx/en/3-wheel-cargo/delivery
+
+切换国家/语言时只重写前缀，slug 保留；<link rel="canonical"> 指向默认语言。
+
+⸻
+
+四、前端改造点（不改视觉、只加逻辑）
+
+1) 顶部导航 + 吸顶筛选 Chips
+	•	顶栏分类：渲染 categories[] 为横向菜单；移动端进入抽屉“全部分类”。
+	•	吸顶 Chips：从 categories 填充一级 Chips；当进入某一级类目页时，二级 Chips 从 children[] 渲染（点击锚点滚动到对应分组）。
+	•	选中态：通过 URL 判断当前激活。
+
+2) 分类落地页（Category Landing）
+	•	顶部展示类目横幅图（如果 hero 存在）+ 类目标题
+	•	页面下方拼成多个二级分组区块（每组 3–6 个卡片，附“查看全部”），并支持滚动定位
+	•	空分组：隐藏分组标题与“查看全部”（避免露白）
+
+3) 列表页（单一二级类目）
+	•	保持你现有的栅格卡片；load more/分页直接用查询参数
+	•	排序项：热门、省钱最大、价格升/降
+	•	过滤项（可选）：电压/里程/载重/价格段；这些都是 query 透传到接口
+
+4) 详情页
+	•	面包屑：首页 > 3-Wheel Cargo > Delivery > 车型名（来源于入口 URL 或产品默认类目）
+	•	关联产品：展示同 subcategory 的 4–8 个产品（不含自己）
+	•	其余逻辑按你已定稿（多变体、联动图、Group vs Solo、进度、船期、工厂/包装卡片）
+
+⸻
+
+五、后台可新增/编辑类目的需求（最小化）
+	•	字段：name（多语言）、slug、visibleCountries[]、hero（可选）、children[]（子项 name/slug）
+	•	上/下线：只要不给 visibleCountries 包含该国，前台就不展示
+	•	排序：返回顺序即前台顺序
+	•	安全：slug 唯一；删除类目前需提示是否已有产品引用
+
+⸻
+
+六、i18n & 国家差异
+	•	类目名走多语言字典（如上 name.{lang}），前台不硬编码
+	•	国家差异：如某国暂不卖“配件”，后台把该类目的 visibleCountries 去掉该国即可
+	•	价格/币种/ETA 已在你的其它页面契约里支持，分类只是驱动“产品集”不同
+
+⸻
+
+七、边界与容错
+	•	同一产品可挂多个类目/子类目（例如 2W 也可出现在“快递载货”子类），列表按去重展示
+	•	空分类：显示“暂未开售，去推荐类目”引导
+	•	404：未知 slug → 跳转到同国家语言的 /categories 索引页（可选做一个总览页）
+
+⸻
+
+八、实施清单（给 Cloud Code 的执行步骤）
+	1.	接入分类接口：页面初始化拉 GET /api/categories?country=MX&lang=en；缓存 10 分钟。
+	2.	顶栏/吸顶 Chips 动态渲染：根据当前 URL 设置激活态与可见项。
+	3.	分类落地页：读取 categorySlug（和可选 subSlug），按照二级分组拉取产品并分区渲染。
+	4.	列表页：实现 category/subcategory/过滤/排序/分页的查询串拼接与渲染。
+	5.	详情页面包屑/关联产品：若从分类页进入，记录来源 category/sub；若直链进入，使用产品 defaultCategory/defaultSub。
+	6.	SEO：写 meta title/description，link rel="canonical"；类目页加 JSON-LD ItemList（可选）。
+	7.	QA：见下节清单。
+
+⸻
+
+九、验收（QA）清单
+	•	顶栏与吸顶 Chips 在不同国家/语言下文案正确、顺序正确
+	•	新增/隐藏类目 → 刷新后前台自动更新，无需发版
+	•	类目落地页二级区块只显示有货的分组，空分组自动隐藏
+	•	列表分页/排序/筛选参数与 URL 同步（刷新不丢状态）
+	•	详情面包屑正确；“查看全部”回到对应二级类目
+	•	SEO：类目页可被抓取、canonical 正确、无死链
+	•	移动端抽屉分类操作顺手（单手可点，点击背景关闭）
+

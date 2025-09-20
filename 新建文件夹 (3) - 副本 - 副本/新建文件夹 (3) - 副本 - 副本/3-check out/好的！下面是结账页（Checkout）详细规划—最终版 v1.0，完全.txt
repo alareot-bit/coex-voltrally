@@ -1,0 +1,253 @@
+
+
+
+VoltRally 结账页 checkout.html — 开发文档 v1.0
+
+强约束
+	•	视觉统一：复用黑金主题与已存在组件（按钮、进度条、chips、吸顶、表格、弹窗），禁止新增配色/字号/阴影。
+	•	设计不改版：仅在原页面骨架上补充字段、交互、数据绑定与异常处理。
+	•	数据直连：保留后端接口契约；前期可用 /data/*.json mock，后端就绪后零改字段名直切 API。
+
+页面路径
+/pages/checkout.html?country=<ISO2>&lang=<i18n>
+入口数据
+从详情页带入 orderDraft（推荐优先 history.state，回退 localStorage('VR_ORDER_DRAFT')）。
+
+⸻
+
+1) 用户目标与两条主路径
+	•	群购（Group）默认路径：把同一国家同一批次的多变体行（variant+qty）合并下单 → 生成订单 → 跳 TT 页上传水单。
+	•	单买（Solo）路径：逻辑一致，但价格采用 Solo 通道；当数量 ≥5，引导 WhatsApp 报批发价或转 B2B流程（弹窗/页内提示）。
+
+⸻
+
+2) 信息架构（四步 Stepper）
+
+PC：左主流程 + 右固定结算摘要（吸顶/吸底）。移动端：纵向分步，摘要在底部吸附。
+
+Step 1. 批次与商品（Review & Batch）
+	•	订单行列表（与详情页风格一致）
+	•	列：图片缩略、标题+变体标签、模式（Group/Solo）、单价、步进器数量、行小计、删除。
+	•	多行组合可存在（不同变体/型号）。
+	•	批次选择
+	•	默认：来自详情页 batchId；若同国存在多个“开放批次”，显示批次选择器（radio 或下拉）。
+	•	显示批次关键信息：BatchID / 容器类型（20GP≈36 | 40HQ≈84）/ Lock / Ship / ETA 倒计时。
+	•	约束与拆单逻辑
+	•	不同国家/不同批次的货品禁止混入同一个草单（给出“拆分提示”，可“一键拆单”生成多个 draft，逐单结账）。
+	•	若 sum(qty) + seatJoined > seatTarget：提示“超额将自动划入下个批次”，用户确认后：
+	•	当前批次填满；剩余数量生成下一个批次草单（预占位，进入“稍后处理”或引导立即下单）。
+	•	操作
+	•	继续购物（返回列表/详情）
+	•	下一步（校验通过）
+
+Step 2. 到港/收货信息（Destination）
+	•	国家 & 语言（只读当前，给“修改”入口→国家选择页或页内弹窗；修改后全局刷新价格/时效）
+	•	到港/收货方式
+	•	默认到港（To Port）
+	•	字段：港口（本国下拉，如 MX: Manzanillo / Veracruz…）、目的城市（可选/文本）、联系人、电话、邮箱。
+	•	可选备注：提货/清关协助要求（文本）。
+	•	国家差异化字段（按国家配置）
+	•	taxIdLabel（如 RFC/CPF/CNPJ/TIN 等）可选或必填由 /data/country/<ISO2>-form.json 控制。
+	•	电话前缀随国家显示（+52 / +62 / +234…）。
+	•	校验
+	•	必填项高亮；电话/邮箱格式校验；税号正则（若有）。
+	•	操作
+	•	上一步 / 下一步
+
+Step 3. 条款、发票与支付方式（Terms & Payment）
+	•	支付方式：仅显示 TT 银行转账（单选、默认）
+	•	显示国家对应收款信息的摘要（银行/收款名/SWIFT 不展示明文，只提示“生成订单后显示完整收款信息与备注”）。
+	•	发票信息（可选）
+	•	是否需要发票（toggle），需要时：抬头、税号、地址。
+	•	协议勾选（必须）
+	•	I agree to Shipping / Refund / Warranty（三个链接到静态页）。
+	•	未勾选禁用“生成订单”。
+	•	操作
+	•	上一步 / 生成订单 & 跳 TT（提交创建草单）
+
+Step 4. 确认 & 引导（Confirm）
+	•	显示 “Order Created” toast + 关键摘要（OrderId、应付金额、货币、批次）
+	•	自动跳转：/pages/payment-tt.html?orderId=...
+	•	如果接口响应 verifying 或 pending_tt 之外状态（异常），留在本页并给出指引。
+
+⸻
+
+3) 结算摘要（固定模块）
+	•	You Pay（大号）
+	•	拆分：Factory Price + Group Freight Split + Fees（如有）= Total
+	•	税费声明（灰字，跳政策）
+	•	ETA 提示：国家范围（如 30–40 days）+ 批次 Ship/Arrive node。
+	•	“支持 TT / 2年质保 / 工厂直销”保障条
+	•	移动端：底部吸附（半透明毛玻璃）显示总价与“下一步/生成订单”按钮。
+
+⸻
+
+4) 数据模型（前端草单）
+
+与详情页一致的字段名，新增收货/发票/条款字段；提交前本地组装。
+
+{
+  "orderDraft":{
+    "country":"MX",
+    "lang":"es",
+    "batchId":"MX-203",
+    "mode":"group",
+    "lines":[
+      {"variantId":"v_72v45_white","label":"72V 45Ah · White","qty":2,"unitPrice":2649,"currency":"USD"},
+      {"variantId":"v_72v60_blue","label":"72V 60Ah · Blue","qty":1,"unitPrice":2799,"currency":"USD"}
+    ],
+    "delivery":{
+      "toPort":true,
+      "port":"Manzanillo",
+      "city":"CDMX",
+      "contact":{"name":"Diego","phone":"+52 55...","email":"x@x.com"},
+      "taxId":"RFC-XXXX", 
+      "note":"Need forklift at port"
+    },
+    "invoice":{"need":true,"title":"ABC SA","taxNo":"RFC-XXXX","address":"Mexico City"},
+    "agreements":{"shipping":true,"refund":true,"warranty":true},
+    "currency":"USD",
+    "totals":{"items":8097,"freight":0,"fees":0,"payable":8097}
+  }
+}
+
+金额口径
+	•	Group：payable = Σ(unitPrice×qty) + groupFreightSplit(country) + fees
+	•	Solo：同上但 freight 采用 Solo 运费口径。
+	•	节省：在摘要处可对照显示（可选）。
+
+⸻
+
+5) API 契约（保持字段名，先 mock 后直连）
+
+5.1 创建订单草单
+
+POST /api/order/draft
+
+{
+  "country":"MX",
+  "lang":"es",
+  "batchId":"MX-203",
+  "mode":"group",
+  "lines":[{"variantId":"v_72v45_white","qty":2},{"variantId":"v_72v60_blue","qty":1}],
+  "delivery":{"toPort":true,"port":"Manzanillo","city":"CDMX","contact":{"name":"Diego","phone":"+52...","email":"x@x.com"},"taxId":"RFC-XXXX","note":""},
+  "invoice":{"need":true,"title":"ABC SA","taxNo":"RFC-XXXX","address":"Mexico City"},
+  "agreements":{"shipping":true,"refund":true,"warranty":true},
+  "currency":"USD"
+}
+
+Response
+
+{
+  "orderId":"VR-20250906-0012",
+  "status":"pending_tt",
+  "currency":"USD",
+  "payable":8097,
+  "batch":{"id":"MX-203","lockAt":"2025-09-24T23:59:59Z","shipAt":"2025-09-26T12:00:00Z","arriveAt":"2025-11-08T12:00:00Z"}
+}
+
+5.2 获取国家表单配置
+
+GET /api/country/form?code=MX
+
+{"taxIdLabel":"RFC","taxIdRequired":true,"phoneMask":"+52 99 9999 9999","ports":["Manzanillo","Veracruz", "Altamira"]}
+
+5.3 价格再校验（可选）
+
+POST /api/pricing/verify（下单前重算一次）
+Response：{ "delta":0, "payable":8097 }（若有变动需用户二次确认）
+
+⸻
+
+6) 前端交互细节（data-attributes）
+	•	data-action="qty-inc" / qty-dec"（data-line-index）
+	•	data-action="remove-line"
+	•	data-action="batch-change"（value=batchId）
+	•	data-action="country-open" / lang-open"（打开选择器）
+	•	data-action="port-select"（value=portName）
+	•	data-action="toggle-invoice"
+	•	data-action="agree"（value=shipping|refund|warranty）
+	•	data-action="submit-draft"（点击创建订单）
+
+微动效
+	•	步进器数值改变 → 行小计与总价平滑数字翻动（.2s）
+	•	批次切换 → Ship/Arrive 的日期/倒计时淡入更新
+	•	删除行 → 高度塌陷过渡（.2s）
+
+状态持久化
+	•	每次编辑 orderDraft 同步 localStorage('VR_ORDER_DRAFT')，刷新不丢失；提交成功后清空。
+
+⸻
+
+7) 校验与规则
+	•	国家/语言：URL>LocalStorage>IP，最终入草单。
+	•	必填项：port、contact.name/phone/email（正则）
+	•	税号：按国家配置 taxIdRequired 决定必填；正则来自 /api/country/form。
+	•	批次与国家一致性：不一致时阻止继续。
+	•	席位限制：若超座，弹窗说明“部分转入下批次”；确认后自动拆单。
+	•	协议：未全勾选禁用提交。
+	•	价格一致性：与 pricing/verify 不一致→弹窗二次确认。
+
+⸻
+
+8) i18n 与币种
+	•	语言键沿用你站点字典（如 c.checkout, c.to_port, c.contact, c.generate_order, c.tt_only…）。
+	•	货币格式化：统一工具 formatMoney(value, currency)；千分位、小数位按国家习惯。
+	•	时间：lockAt/shipAt/arriveAt 使用国家时区显示；倒计时以 UTC 计算避免偏差。
+
+⸻
+
+9) 错误与空态
+	•	orderDraft.lines 为空 → 返回列表页并 toast “未选择商品”。
+	•	API 失败 → toast + 重试；本地保存草单不丢。
+	•	校验失败 → 就地红字提示 + 滚动对齐到第一个错误。
+	•	超额拆单 → 明确显示“当前批次 X 台、下批次 Y 台”，可点击“稍后处理”。
+
+⸻
+
+10) 可访问性 / 性能
+	•	所有控件可键盘操作；aria-label 与 aria-describedby 完整。
+	•	对比度≥4.5:1；错误提示具备 role="alert"。
+	•	图片 loading="lazy"；JS 按需加载；首屏 JS/CSS ≤150KB（gzip）。
+	•	所有资源本地化；禁止外链以防失效。
+
+⸻
+
+11) 埋点（最少集）
+	•	checkout_view（country, batchId, linesCount, totalQty, mode）
+	•	checkout_edit_qty（lineIndex, qty）
+	•	checkout_remove_line
+	•	checkout_change_batch（from→to）
+	•	checkout_submit_attempt / checkout_submit_success / checkout_submit_fail
+	•	checkout_split_next_batch_confirm（yes/no）
+
+⸻
+
+12) QA 验收清单
+	•	视觉 1:1 复用黑金组件；移动端吸底摘要不抖动
+	•	多行组合编辑正确、总价实时正确
+	•	国家/语言切换→端到端联动（端口/时效/币种/文案）
+	•	批次倒计时、ETA 正确（含时区）
+	•	协议未全勾选禁用提交
+	•	超额座位自动拆单逻辑可用
+	•	API 失败有回退与提示；刷新状态不丢
+	•	控制台 0 报错、0 404
+
+⸻
+
+13) 目录与交付
+
+/pages/checkout.html
+/assets/css/theme.css            # 复用
+/assets/js/app.js               # 统一 data-action 事件
+/data/country/<ISO2>-form.json  # 国家差异化表单配置
+
+
+⸻
+
+一句话给 Cloud Code 的执行指令
+
+
+⸻
+
+如果这版你确认没有遗漏，我可以继续把 payment-tt.html（线下 TT 上传） 和 order.html（订单追踪） 的“可复制给 Cloud Code 的占位结构 + data-attributes 注释版”也写出来，方便他们 1:1 按 DOM 骨架直接落代码。

@@ -1,0 +1,288 @@
+VoltRally — 前端/产品 PRD（黑金版本 · v1.0）
+
+口号：Factory-direct. Crowd-powered.
+日期：2025-09-06（America/Los_Angeles）
+适配：Web + 移动端（移动优先，Web 同版式扩展）
+
+⸻
+
+1. 产品愿景 & 目标
+	•	让 C 端与小 B 以工厂直销价 + 拼柜分摊海运的方式购买 2 轮/3 轮电动车与电池/配件。
+	•	用大图/视频+极简路径完成从浏览→拼团→结账→TT 上传→订单追踪的全链路。
+	•	国家差异化（价格/币种/税号/港口/船期），类目可后台新增，前台无须重发版即可生效。
+
+MVP 成功标准（任一上线 30 天内满足）
+	•	首页→详情→结账转化率 ≥ 2.5%
+	•	单国月度发运 ≥ 1 个 20GP 批次（36 台）
+	•	订单支付路径 TT 水单上传率 ≥ 60%
+
+⸻
+
+2. 范围（MVP）与非目标
+
+MVP
+	•	国家/语言/币种本地化（IP 自动 + 手动切换）
+	•	类目体系：2 轮 / 3 轮 / 电池 / 配件 + 后台可新增一级/二级类目（Taxonomy 动态）
+	•	首页（滚动订单、倒计时、拼团进度、头像/Need 数、分享）
+	•	列表/分类页（吸顶筛选 Chips、排序、分页）
+	•	详情页（多变体、联动图、Group vs Solo 对比、批次时间线、参数、工厂与包装卡片、关联）
+	•	结账 4 步（商品/批次 → 到港信息 → 条款/发票 → 生成订单）
+	•	付款（TT 银行信息展示、复制、TT 水单上传/替换/提交）
+	•	订单追踪（状态 Pill、批次时间轴、拼单席位进度、物流节点、文件）
+	•	会员：登录/注册（Email/手机可选 + Google 或 TikTok 其一）、我的订单、我的拼团、地址簿、发票抬头、通知中心、工单/客服、账户设置
+	•	SEO（类目与详情页）、基础埋点
+
+非目标（MVP 以后）
+	•	在线支付（除 TT 以外）
+	•	公开物流分享单页（脱敏）
+	•	子账号/团队协作、小 B 批量下单工具
+
+⸻
+
+3. 目标用户与市场
+	•	人群：C 端终端买家 & 小 B（修理店/小经销商）；文化水平参差，偏好大图直给 + 明确省钱。
+	•	地区：拉美/中东/非洲/东南亚，先开 7–8 个主力国家（后台勾选开通）。
+
+⸻
+
+4. 核心价值主张（对外文案要点）
+	•	Factory-direct：工厂直达，透明出厂价。
+	•	Crowd-powered：拼满一个柜一起发，海运人均摊，越拼越省。
+	•	Clear timeline：Lock / Ship / Arrive 明确可视，带倒计时。
+	•	安心保障：2 年核心电器质保；UN38.3/MSDS/CE 文档齐备。
+	•	实打实省钱：同一车型 Solo vs Group 实付差额与节省金额醒目展示。
+
+⸻
+
+5. 关键用户路径（移动优先）
+	1.	进入（TikTok/WhatsApp/直接域名）→ Home 自动 识别国家（可手选）；
+	2.	首页：看到国家 Pill、批次倒计时、Need/Joined/目标、滚动订单、入口分类；
+	3.	分类/列表：吸顶 Chips 选类/子类，排序/筛选；
+	4.	详情：选变体（颜色/电压/电池），联动主图；切换 Solo ↔ Group 看价格/省钱变化；查看船期、ETA、参数、工厂/包装卡；
+	5.	加入（Join Group 或 Buy Solo）→ 结账 4 步；
+	6.	生成订单 → 跳转 TT 页面：复制银行信息、上传水单、提交审核；
+	7.	订单页：看状态/时间轴/物流/文件，接收通知；客服入口随时可达。
+
+⸻
+
+6. 信息架构 & 页面清单
+
+公共：黑金主题、吸顶分类、底部移动导航（Home/分类/拼团/订单/我的）
+
+核心页面
+	•	首页（Home）
+	•	分类落地页（Category Landing：一级类目 + 二级分组锚点）
+	•	列表页（Category List：单一二级类目）
+	•	详情页（PDP）
+	•	结账（Checkout 4 步）
+	•	付款-TT 上传（Payment-TT）
+	•	订单/追踪（Order Tracking）
+
+会员页面
+	•	会员中心（Dashboard）
+	•	我的订单、我的拼团
+	•	地址簿、发票抬头
+	•	通知中心、工单/客服
+	•	账户设置
+	•	登录/注册/忘记密码/第三方绑定
+
+静态政策：运费、退款、质保
+
+⸻
+
+7. 功能需求（按模块）
+
+7.1 本地化（国家/语言/币种）
+	•	IP 定位推断国家；首屏国家 Pill展示“MX/EN/货币”；手动切换优先（URL 前缀或本地存储）
+	•	切换后联动：价格/币种、ETA/船期、表单字段（RFC/CPF 等）与类目可见性
+	•	缺省回退：定位失败→默认国家（可配置）
+
+7.2 类目（Taxonomy）— 后台可新增
+	•	一级：2W / 3W / Batteries / Parts & Accessories（可增减）
+	•	二级：由后台配置的 children[] 渲染；不同国家可隐藏某些类目
+	•	URL：/{country}/{lang}/{categorySlug} 与 /{country}/{lang}/{categorySlug}/{subSlug}
+	•	前台不写死文案，使用返回 JSON 的 name.{lang}
+
+7.3 产品目录与变体
+	•	产品含多变体（颜色/电压/电池容量/后斗类型等）；变体驱动主图与库存/可售
+	•	关键字段：标题、卖点短语、规格标签、参数（功率/时速/续航/载重/尺寸/电池/电机/控制器等）、证书、包装尺寸/方数、图集/视频、默认类目/二级类目
+	•	关联产品：同二级类目的 4–8 个（排除自身）
+
+7.4 拼团/批次引擎
+	•	批次节点：Open → Lock → Ship → Arrive（每产品/每国可不同；默认 Open 15 天 + Prep 3 天）
+	•	席位：20GP≈36、40GP≈78、40HQ≈84、45HQ≈94（默认值可后台改）
+	•	进度：Joined/Target → Need 可视进度条 + 头像圈（隐私：仅国旗/首字母）
+	•	合柜规则（后台）：同国不同产品可转移席位到目标产品（仅已付款并审核通过的席位），用于快速凑满；前台只展示最终进度
+	•	锁仓：到 Lock 时未满，已付席位可选择顺延下批或申请退款（按政策）
+
+7.5 价格模型与省钱展示
+	•	工厂价（Factory）+ Freight Split（拼柜均摊）+ 其他 Fee = You Pay
+	•	Solo vs Group 对比：展示Solo 运费与Group 运费差异，显式“Save $X”
+	•	详情/卡片都提供 Solo↔Group 切换（仅影响显示）
+
+7.6 首页特性
+	•	大图/视频；国家 Pill；倒计时（到 Lock）；滚动订单 Ticker（伪匿名）；拼团进度卡
+	•	顶部/吸顶分类 Chips；“Join Now • Save $X” 主按钮
+	•	滚动弹出：某国某人加入/付款 ×N（支付成功才计入进度）
+
+7.7 详情页（PDP）
+	•	多变体选择 → 主图联动；Group vs Solo 模式切换；省钱金额显眼
+	•	批次时间线（Lock/Ship/Arrive + 倒计时）
+	•	参数区块（支持折叠）；工厂卡（品牌/产线图/质保/证书）；包装卡（箱规、CBM、含电池运输级别）
+	•	关联产品与分享（Web Share / 复制链接）
+
+7.8 结账（4 步）
+	1.	商品/批次：行项目、变体、数量增减、批次选择（若多批次开放）
+	2.	到港信息（To-Port）：港口下拉（按国）、城市、联系人、电话、邮箱、税号字段按国差异（RFC/CPF/CNPJ…），备注
+	3.	条款&发票：勾选运费/退款/质保；“需要发票”展开抬头/税号/地址
+	4.	生成订单：创建草单→跳转 TT 页
+
+7.9 付款（TT 上传）
+	•	展示应付金额/币种、批次节点、银行信息（按国配置）
+	•	一键复制（单字段 & 全卡）；上传/替换/删除水单（jpg/png/pdf ≤10MB）；提交审核（状态转 verifying）
+	•	上传即刻预览；提交成功弹层 + 跳转订单页
+
+7.10 订单/追踪
+	•	状态 Pill 与 批次时间轴 同步；拼团进度与 Need 显示
+	•	物流节点：ready_factory → to_port → on_vessel → arrive_port → customs → ready_pickup/delivery → completed
+	•	文件区：TT 水单（可重新上传）、发票/装箱单下载（就绪才显示）
+	•	悬浮客服（WhatsApp/Email）
+
+7.11 会员与其他
+	•	登录/注册（Email/手机 + 第三方其一）
+	•	我的订单（筛选、查看、补传水单、下载 PI/发票）
+	•	我的拼团（我参与的批次、Need、加购、在锁仓前允许退出规则）
+	•	地址簿、发票抬头（与结账联动可选）
+	•	通知中心（拼团成团/锁仓/船开/到港）
+	•	工单/客服（问题分类、描述、附件、状态）
+	•	账户设置（资料、语言/国家、密码/2FA、社交绑定）
+
+⸻
+
+8. 非功能需求
+	•	性能：首屏 LCP ≤ 2.5s（4G）；JS ≤ 150KB gzip 首屏；图片懒加载/WebP
+	•	可访问性：对比度 ≥ 4.5:1；键盘可达；错误 role="alert"
+	•	安全：文件上传白名单与大小限制；银行信息仅明文展示不持久化到前端缓存
+	•	隐私：滚动订单与头像仅展示国旗/首字母（可开关）
+	•	稳定：订单页 15s 轮询，失败指数退避（上限 120s）
+
+⸻
+
+9. 数据模型（概要）
+	•	Category：id、slug、name.{lang}、hero、visibleCountries[]、children[]
+	•	Product：id、slug、title、sellPoints[]、specTags[]、params{}、media[]、certs[]、packaging{}、defaultCategory/sub
+	•	Variant：id、attrs{color, voltage, battery…}、images[]、stock、priceFactory、priceSoloFreight、priceGroupFreight、fees{}
+	•	Batch：id、country、containerType（20GP/40HQ…）、seatTarget、seatJoined、timeline{open/lock/ship/arrive}
+	•	Order：id、userId、country、currency、status、lines[]、charges{factory, freight, fees, total}、batchId、timeline{}
+	•	OrderLine：productId、variantId、mode(group|solo)、qty、unitPrice、subtotal
+	•	Payment：orderId、method=TT、ttSlipUrl、status(pending_tt|verifying|confirmed)
+	•	LogisticsEvent：orderId、code、time、note
+	•	User：id、name、email/phone、countryPref/langPref、addresses[]、invoiceProfiles[]
+	•	Documents：PI、Invoice、PackingList、TTSLIP
+
+⸻
+
+10. 接口（MVP 协议草案）
+	•	GET /api/categories?country=MX&lang=en → 类目 JSON（含 children、可见国家）
+	•	GET /api/products?country=MX&lang=en&category=cat_3w&subcategory=sub_3w_delivery&page=1&pageSize=12&sort=popular → 列表
+	•	GET /api/product/:slug?country=MX&lang=en → 详情 + 变体
+	•	GET /api/batches?productId=&country=MX → 可选批次
+	•	POST /api/checkout/create → 创建草单（提交 4 步数据，返回 orderId）
+	•	GET /api/payment/tt/info?orderId= → TT 页摘要 + 银行信息
+	•	POST /api/payment/tt/upload（multipart：orderId,file）→ 返回 ttSlipUrl
+	•	POST /api/payment/tt/submit（orderId）→ 状态 verifying
+	•	GET /api/order/:id → 订单页（金额/批次/进度/物流/文件）
+	•	POST /api/auth/login|register|social、GET/PUT /api/user/profile、GET/POST /api/user/addresses、GET/POST /api/user/invoices
+	•	GET /api/notify、POST /api/notify/read、GET/POST /api/ticket
+
+说明：字段名与我们之前对齐的占位骨架一致；Cloud Code 可先用 /data/*.json mock，后端就位后替换 fetch 源。
+
+⸻
+
+11. 状态/错误与交互反馈
+
+订单状态（短表）
+
+代码	含义
+pending_tt	已创建待上传 TT
+verifying	财务审核中
+confirmed	已确认待出厂
+to_port/on_vessel/customs	在途至港/海上/清关
+ready_pickup	可提货/派送
+completed/canceled	已完成/已取消
+
+关键错误处理
+	•	锁仓到期未付：详情/结账/TT 明确提示“顺延下一批或申请退款”
+	•	上传失败/类型超限：红字 + toast；按钮禁用态
+	•	轮询失败：黄条 + 退避重试；手动刷新入口
+	•	类目/产品空：优雅空态 + 推荐类目
+
+⸻
+
+12. UI/UX 规范（黑金版本）
+	•	风格：深色 #0b0d10 背景、金色渐变（#d4af37→#f5c044）、细线边框、柔和阴影；大图优先（首屏与 PDP hero）
+	•	组件：吸顶 Chips、进度条、倒计时、头像圈、票据卡、时间轴
+	•	微交互：Ripple 点击波纹、进度条入场、粘性筛选平滑滚动、价格模式切换动画、复制成功 toast、上传预览淡入
+	•	移动端：底部吸附导航；结账摘要吸底；表单一列；按钮可拇指点击
+	•	可读性：标题 18–22px；正文 15–16px；按钮 44px 触达
+
+⸻
+
+13. 页面级验收标准（节选）
+
+首页
+	•	显示国家 Pill、Lock 倒计时、Need/Joined/Target、滚动订单；
+	•	分类 Chips 可滚动定位；Join Now • Save $X 正常可用；
+	•	移动端 3 步内可达详情页。
+
+详情页
+	•	变体→主图联动；Solo/Group 切换价与 Save 正确；
+	•	批次时间线与倒计时准确；工厂/包装卡显示；
+	•	关联产品与分享可用。
+
+结账
+	•	4 步流程可前后跳；港口/税号按国家差异显示；
+	•	勾选条款后可创建订单。
+
+付款-TT
+	•	银行信息按国家显示；复制/上传/提交可用；
+	•	提交后状态变更并跳转订单。
+
+订单
+	•	状态与时间轴同步；进度条、Need、头像圈渲染；
+	•	物流节点可展开；文件下载/重传正常；
+	•	15s 轮询 + 退避生效。
+
+会员
+	•	订单/拼团列表筛选；地址簿/发票抬头与结账联动；
+	•	通知就地可读并可跳转；工单可创建与附图。
+
+⸻
+
+14. 里程碑（建议）
+	•	M0（3–5 天）：接入动态类目、列表/详情/结账打通（mock）
+	•	M1（5–7 天）：TT 上传、订单追踪、通知/工单基础
+	•	M2（5–7 天）：会员全套、SEO、埋点、QA 与修复
+	•	上线：单一国家灰度 → 多国开关
+
+⸻
+
+15. 风险与缓解
+	•	类目变更频繁：采用 Taxonomy 接口驱动 + 10 分钟缓存 + 缓存失效标记
+	•	席位合柜复杂：前台仅显示结果；后台提供席位转移操作日志
+	•	各国合规：银行卡信息与税号字段走配置；政策页在结账前强制确认
+	•	移动网络不稳：重要动作本地兜底提示与重试
+
+⸻
+
+16. 术语
+	•	Seat：拼柜席位（1 台=1 席）
+	•	Batch：拼团批次（与某国家/产品/柜型绑定）
+	•	Lock/Ship/Arrive：锁仓/开船/到港节点
+	•	TT：Telegraphic Transfer 电汇
+
+⸻
+
+附：给 Cloud Code 的执行要点（一句话）
+
+在不改黑金视觉前提下：把类目/二级类目做成接口驱动，完成首页/分类落地/列表/详情/结账/TT/订单与会员区的交互绑定（data-action/data-field），按本文档 API/数据模型对齐；先用 /data/*.json mock，后端就位后替换 fetch 源；按页面验收清单逐项自测后交付 dist。

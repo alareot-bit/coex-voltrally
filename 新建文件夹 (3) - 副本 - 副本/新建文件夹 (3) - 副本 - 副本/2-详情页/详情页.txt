@@ -1,0 +1,297 @@
+
+VoltRally 详情页（黑金风格）开发文档 v1.0
+
+强约束：在既有设计文件基础上1:1 还原，禁止重做视觉（颜色/字号/圆角/阴影/布局不变）。只补交互、数据与串联。
+页面路径：/pages/product.html?slug=<product-slug>&batch=<batchId>&country=<ISO2>&lang=<i18n>
+
+⸻
+
+1. 目标与范围
+	•	支持 多变体（颜色/容量/箱体/电机等）切换，联动 主图、价格、规格。
+	•	支持 国家/IP 定位 后的 语言/币种/运费/发货时效 自动展示；可手动切换（写入 LocalStorage）。
+	•	参数采用 分组块状 展示（规格、认证、包装/物流、保修、工厂信息）。
+	•	支持 线下 TT 转账：生成带明细的订单草案（order draft），进入结算/支付页。
+	•	与后端 接口直连：保留契约字段与请求/响应格式，前端先用本地 JSON mock，后端就位后直切换。
+
+⸻
+
+2. 页面结构（在原稿上标注）
+
+2.1 首屏（Above the fold）
+	•	媒体画廊：大图 + 拇指/圆点，移动端支持横滑与双击放大。
+	•	关键信息卡（右侧 or 下方）：
+	•	产品标题（粗体）
+	•	规格短语：如 72V 45Ah · 40 km/h · 80–90 km · Payload 400kg
+	•	价格模块（Solo/Group 切换，默认 Group）：
+	•	你付（最终应付价，特大）
+	•	参考价（删除线）
+	•	节省金额（绿色）
+	•	批次时间轴 4 格：Open / Lock / Ship / Arrive（含倒计时到 Lock）
+	•	拼单进度条：Joined / Target，右侧 Need N more
+	•	CTA：Join Group（主） / Buy 1–4 (Solo) / WhatsApp for 5+
+	•	保障条：Factory-direct · TT verification · 2-year warranty
+
+2.2 吸顶迷你栏（滚动 > 56px）
+	•	左：返回 ← 产品名（单行省略）
+	•	中：小进度条 + Joined x/y
+	•	右：Group 最终应付价 + Join 小按钮
+
+⸻
+
+3. 分组信息块（Below the fold）
+	1.	Specifications（规格）
+	•	图标胶囊：电压/容量/速度/续航/载重/轮胎/制动等
+	•	参数表：两列（参数名/参数值），映射报价单字段
+	2.	Variants（变体）
+	•	变体按钮/下拉（容量/车厢/电机/颜色）；切换联动 图集/规格短语/价格/包装
+	3.	Pricing Breakdown（价格组成）
+	•	最终应付（大号）= 工厂价 + 团运分摊 + 附加费（如有）
+	•	Solo 对照价（删除线）
+	•	运费分摊说明 tooltip（仅文案说明）
+	4.	Batch（批次）
+	•	Batch ID / Container (20GP≈36, 40HQ≈84) / Joined / Target / Need
+	•	头像圈（匿名/国旗首字母）
+	•	“切换到下批次”链接（跳批次列表页或预留）
+	5.	Compliance & Warranty（认证与保修）
+	•	Chips：UN38.3 MSDS CE 等
+	•	2-year warranty 文案 + 链接到政策页
+	6.	Factory Showcase（工厂展示）
+	•	3–6 张照片轮播（厂房/产线/仓库/测试）
+	•	要点：ISO9001、年产能、焊接/喷涂线、IQC/OQC 流程（图标+短句）
+	7.	Shipping & Packaging（发货与包装）
+	•	包装图（外箱/木架/加固）
+	•	表格：毛重/净重/外箱尺寸/CBM/20GP/40HQ 装载量
+	•	危规：UN38.3 报告号（占位）、电池申报说明
+	8.	Related Products（关联产品）
+	•	3–6 卡片：图、名、三条规格、Group 价、节省、进度条、Join 按钮
+	•	逻辑：优先同品类/同电压/相近价位
+
+⸻
+
+4. 数据模型（与后端契约，一次对齐）
+
+前端先以 JSON mock；后端就位后仅换数据源，不改字段名。
+
+4.1 渲染对象（详情页一次性拿齐）
+
+{
+  "product": {
+    "id": "prd_ct400",
+    "slug": "cargo-trike-400kg",
+    "title": "Cargo Trike 400kg",
+    "category": "3w",
+    "heroImages": ["assets/img/ct400_1.webp","assets/img/ct400_2.webp"],
+    "specTags": ["72V 45Ah","40 km/h","80–90 km","Payload 400kg"],
+    "specTable": [
+      {"k":"Voltage","v":"72V"},
+      {"k":"Battery","v":"LFP 45Ah"},
+      {"k":"Motor","v":"1.5kW"},
+      {"k":"Brakes","v":"Disc/Drum"},
+      {"k":"Tire","v":"3×12\""}
+    ],
+    "compliance": ["UN38.3","MSDS","CE"],
+    "warrantyMonths": 24,
+    "factory": {
+      "name": "BAIFI Plant",
+      "badges": ["ISO9001","Welding line","Annual 30k"],
+      "gallery": ["assets/img/factory_1.webp","assets/img/factory_2.webp"]
+    },
+    "packaging": {
+      "grossWeightKg": 185,
+      "netWeightKg": 160,
+      "cartonSizeCm": "190×75×110",
+      "cbm": 1.57,
+      "load20GP": 36,
+      "load40HQ": 84,
+      "photos": ["assets/img/pack_1.webp"]
+    },
+    "variants": [
+      {
+        "id": "v_72v45_white",
+        "label": "72V 45Ah · White",
+        "attrs": {"color":"white","bed":"cargo"},
+        "images": ["assets/img/ct400_white_1.webp"]
+      },
+      {
+        "id": "v_72v60_blue",
+        "label": "72V 60Ah · Blue",
+        "attrs": {"color":"blue","bed":"cargo"},
+        "images": ["assets/img/ct400_blue_1.webp"]
+      }
+    ],
+    "relatedProductIds": ["prd_ct500","prd_box72","prd_cityeco"]
+  },
+  "batch": {
+    "id": "MX-203",
+    "country": "MX",
+    "container": "20GP",
+    "seatTarget": 36,
+    "seatJoined": 32,
+    "timeline": {
+      "openAt": "2025-09-01T00:00:00Z",
+      "lockAt": "2025-09-24T23:59:59Z",
+      "shipAt": "2025-09-26T12:00:00Z",
+      "arriveAt": "2025-11-08T12:00:00Z"
+    }
+  },
+  "pricing": {
+    "currency": "USD",
+    "soloTotal": 3149,
+    "groupTotal": 2649,
+    "youSave": 500,
+    "freightSplit": 420,
+    "fees": 0
+  },
+  "country": {
+    "code": "MX",
+    "name": "Mexico",
+    "langs": ["en","es"],
+    "etaDays": [30,40]
+  }
+}
+
+4.2 公式（统一口径）
+	•	最终应付（Group）：finalGroup = factoryPrice + groupFreight(country) + fees
+	•	Solo 对照：finalSolo = factoryPrice + soloFreight(country) + fees
+	•	节省：youSave = finalSolo - finalGroup
+	•	进度：progress = seatJoined / seatTarget；need = seatTarget - seatJoined
+
+⸻
+
+5. 多变体与组合下单（同页多行）
+
+5.1 交互
+	•	变体切换：更新 主图/规格短语/价格/包装
+	•	数量选择：步进器（min 1）
+	•	“加入本批次清单”：把当前（variantId, qty）加入本页临时 Order Lines
+	•	本页下方显示 组合清单（可编辑数量、删除行），显示 组合总价（含分摊）
+	•	点击 Join Group 进入结算（把组合行一并带入）
+
+5.2 前端临时结构
+
+{
+  "orderDraft": {
+    "country": "MX",
+    "batchId": "MX-203",
+    "lines": [
+      {"variantId":"v_72v45_white","qty":2,"unitPrice":2649,"mode":"group"},
+      {"variantId":"v_72v60_blue","qty":1,"unitPrice":2799,"mode":"group"}
+    ],
+    "currency":"USD",
+    "totals":{"items":8097,"fees":0,"payable":8097}
+  }
+}
+
+
+⸻
+
+6. 国家/IP 与语言
+
+优先级：URL ?country/lang ＞ LocalStorage ＞ IP 粗定位 ＞ 默认（EN, USD）
+切换国家/语言后需 整体刷新：价格、ETA、港口/币种/文案。
+
+前端调用顺序：
+	1.	读 URL；2) 读 LocalStorage；3) 调 /api/country/current（无则本地 stub）；4) 最终确认并 setStorage。
+
+⸻
+
+7. 事件与 data-attributes（统一绑定）
+	•	data-action="toggle-price"（value=solo|group）
+	•	data-action="variant-change"（value=variantId）
+	•	data-action="qty-inc" / data-action="qty-dec"
+	•	data-action="add-line"（将当前 variant+qty 加入 orderDraft）
+	•	data-action="remove-line"（value=lineIndex）
+	•	data-action="join-group"（跳 /pages/checkout.html?... 携带 orderDraft）
+	•	data-action="buy-solo"（同理，mode=solo）
+	•	data-action="contact-wa"（打开 WhatsApp 链接）
+	•	data-action="share"（Web Share → fallback 复制）
+
+埋点（最少集）
+	•	view_product、toggle_price_mode、variant_change、add_line、remove_line、cta_join_click、cta_buy_solo_click、view_factory_gallery、view_packaging_photo、view_related_click
+
+⸻
+
+8. API 契约（首期可 mock，本名不变）
+
+路径示例，后端就位后保持字段名一致。
+
+	•	GET /api/product/:slug?country=MX&lang=en → 返回 4.1 渲染对象
+	•	GET /api/related?ids=prd_ct500,prd_box72&country=MX → 关联卡片所需简要对象数组
+	•	GET /api/country/current → { code:"MX", lang:"es" }
+	•	POST /api/order/draft
+
+{
+  "country":"MX",
+  "batchId":"MX-203",
+  "lines":[{"variantId":"v_72v45_white","qty":2,"mode":"group"}],
+  "contact":{"name":"", "phone":"", "email":""}
+}
+
+Response：{ "orderId":"VR-20250906-0012","payable":8097,"currency":"USD" }
+
+	•	POST /api/payment/tt/upload（multipart：orderId, file≤10MB）
+Response：{ "status":"pending" }
+
+⸻
+
+9. 错误与空态
+	•	变体/价格缺失 → 禁用 CTA，灰提示“暂不可售”
+	•	批次无 seats → 隐藏进度条与倒计时，仅保留咨询按钮
+	•	图片加载失败 → 本地占位图
+	•	倒计时到 0 → 状态 Closed，禁用 Join，提供“切换下批次”
+
+⸻
+
+10. i18n 文案键（示例）
+
+{
+  "p.join_group": "Join Group",
+  "p.buy_solo": "Buy 1–4 (Solo)",
+  "p.save": "Save {amount}",
+  "p.need_more": "Need {n} more",
+  "p.final_payable": "You pay",
+  "p.reference": "Reference",
+  "p.variant": "Variant",
+  "p.specs": "Specifications",
+  "p.factory": "Factory",
+  "p.packaging": "Shipping & Packaging",
+  "p.related": "Related Products",
+  "p.warranty": "2-year warranty",
+  "p.share": "Share",
+  "p.closed": "Closed"
+}
+
+
+⸻
+
+11. 可访问性 / 性能
+	•	所有交互控件可聚焦，aria-label 完整；
+	•	关键文字对比度 ≥ 4.5:1；
+	•	图片 loading="lazy"，提供 width/height 占位与 LQIP；
+	•	首屏 ≤ 150KB CSS/JS（gzip）；资源本地化，禁止外链过期图。
+
+⸻
+
+12. QA 验收清单（必须逐项过）
+	•	视觉与现有黑金设计像素一致（差异 ≤ 1.5%）
+	•	变体切换联动 主图/规格/价格/包装
+	•	Solo/Group 四处同步（主价、参考、节省、Breakdown）
+	•	倒计时/进度/Need 计算正确（含时区）
+	•	多行组合下单（orderDraft）正确累计与编辑
+	•	国家/语言切换 → 价格/ETA/文案/币种联动
+	•	工厂/包装/关联产品模块可用，图片为本地资源
+	•	分享可用（回退复制）；无 404、无控制台报错
+	•	移动端 375–430 宽布局与吸顶栏不抖动
+
+⸻
+
+13. 交付与目录（固定）
+
+/pages/product.html              # 只在原稿上加 data-* 与绑定
+/assets/css/theme.css            # 黑金变量；禁止新颜色/字号
+/assets/js/app.js                # 事件与数据绑定
+/data/product/<slug>.json        # 渲染对象（4.1）
+/data/related/index.json         # 简要卡片数据
+/assets/img/...                  # 媒体资源（从“设计文件/ 图片/ logo/”搬运）
+
+

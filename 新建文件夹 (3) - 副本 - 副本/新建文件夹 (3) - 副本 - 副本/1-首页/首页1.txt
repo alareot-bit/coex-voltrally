@@ -1,0 +1,347 @@
+
+VoltRally 首页 UX 规范（Web + Mobile）v4.0
+## 0. 强制要求（不要再犯）
+
+1. **禁止静态**：任何国家、价格、进度、倒计时、已加入人数，都必须来自接口，或有 `fetch()` 的占位 URL 和 `mock/*.json` 本地回退。
+2. **禁止图标**：所有“图标”位置用**文字标签**（如 `Open/Lock/Ship/Arrive`、`Solo/Group`、`Save`、`Docs`…），统一风格。
+3. **响应式**：移动端一列、平板两列、桌面三列。**产品卡不使用横滑**，每张卡上同时显示 **Solo 价**与**Group 价**。
+4. **登录/订单入口**：头部导航必须包含 `Orders` 与 `Sign in/Account`（登录后显示用户名与订单红点计数）。
+5. **类目吸顶**：类目 Chip 必须吸顶，点击平滑滚动到对应分区，且高亮当前分区。
+6. **容器台数可配**：每个 SKU 的拼柜目标单位数（20GP/40HQ）从接口获取；不同 SKU 值不同，前端严禁写死。
+7. **国际化**：IP 自定位决定默认国家/语言/币种；用户可在头部手动切换，切换后**全页数据联动刷新**。
+8. **无图时占位**：产品图未返回时显示灰底占位块 + 文案“Image coming soon”，不得留空。
+9. **Skeleton 骨架**：首屏 hero、每区标题、产品卡列表在加载时有骨架，不得闪白。
+10. **可访问性**：所有可交互元素有 `aria-label`、键盘可达、Focus 态可见。
+
+---
+
+## 1. 页面结构（Sections）
+
+```
+/index.html
+  ├─ Header（头部导航）
+  ├─ Hero（国家拼团首屏 + 时间轴 + 倒计时 + CTA）
+  ├─ CategoryTabs（吸顶类目：精选 / 三轮货车 / 两轮电动 / 电池 / 配件 / 为什么选VoltRally）
+  ├─ FeaturedProducts（精选产品）      ← 每类展示 6 个
+  ├─ Category: 3-Wheel Cargo（6 个）
+  ├─ Category: 2-Wheel Electric（6 个）
+  ├─ Category: Batteries（6 个）
+  ├─ Category: Parts & Accessories（6 个）
+  ├─ Why VoltRally（四点价值，无图标，用标题+正文）
+  ├─ Compliance Docs（UN38.3 / MSDS / CE 文档锚点）
+  ├─ Footer（页脚 + 二级入口）
+```
+
+---
+
+## 2. 头部导航（Header）
+
+* 左：`VoltRally` 文本 LOGO（可替换为你们 PNG，但**默认用文字**）
+* 居中：**地区选择器**（国家/语言/货币）
+
+  * 显示：`MX  Mexico  USD`（按钮，点击展开下拉）
+  * 打开时可选择：国家（最多 20 个）、语言（EN/ES/中文…）、货币（USD/MXN/CNY…）
+* 右：
+
+  * `Share`：点击触发 Web Share；若不支持，复制 `window.location.href` 到剪贴板并吐司提示。
+  * `Orders`：按钮 + 红点计数（接口返回），点击跳转 `/my-orders.html`。
+  * `Sign in`（未登录）；已登录显示 `Account`（点击打开下拉：`Dashboard`、`My Orders`、`Sign out`）。
+
+### 数据&接口
+
+* `GET /api/session` → `{ "authenticated": true|false, "user":{"name":"Diego"} }`
+* `GET /api/orders/count?country=MX` → `{ "count": 3 }`
+* `GET /api/geo/resolve`（首次加载）→ `{ "country":"MX","lang":"ES","currency":"MXN","via":"ip" }`
+* 切换保存到 `localStorage.locale`，每次进入优先读 localStorage，其次 `geo/resolve`。
+
+
+0. 目标与边界
+	•	交付一个可交互的首页：国家/语言切换，类目筛选，产品卡展示，USD 唯一货币，两块大价签（Solo/Group）可切换，拼团进度与倒计时，滚动订单条。
+	•	移动端优先：375–414 宽优先设计；桌面横向扩展。
+	•	离线可用：无后端也能展示 4 个类目 × 每类 6 个产品（本地 JSON + 占位图）。
+	•	不使用任何图标/外链：禁用 iconfont/SVG/第三方库；图片要么是占位，要么是本地/内联。
+	•	首页仅涵盖导航、首屏、类目区、产品卡、为什么选择我们、页脚与订单滚动条。不含结账/详情页逻辑（已有独立文档）。
+
+⸻
+
+1. 外观与响应式
+
+1.1 主题（黑金风格）
+	•	背景：深黑蓝（#0B0D10 ~ #121418）。
+	•	强调色（金）：#EAC65A（主），#F5C044（渐变次）。
+	•	文本：主文白（#E8E6E3），辅助灰（#9FB0C2）。
+	•	边框/分隔：#1D232B。
+	•	高亮面板：金色 10–15% 透明背景（例如 #EAC65A1A）。
+
+1.2 排版（Web 与移动）
+	•	断点：
+	•	≤600px：1 列产品卡
+	•	601–1024px：2 列
+	•	≥1025px：3 列（≥1440px 可 4 列）
+	•	文字层级：
+	•	H1：24–28（移动 22）
+	•	类目标题：18–20
+	•	产品名：16–18/两行省略
+	•	规格副标题：14/一行省略
+	•	主价（选中模式）：20–22（移动 18–20）
+	•	次价：16–18
+	•	说明/筹码：12–13
+
+⸻
+
+2. 页面区块与交互
+
+2.1 Header（吸顶）
+	•	左：Logo 文本 “VoltRally”（使用你们的图片 logo 亦可，但不得外链）。
+	•	中：类目导航入口（“3-Wheel Cargo / 2-Wheel Electric / Batteries / Parts”），点击滚动定位对应区块。
+	•	右：
+	•	国家下拉（Country）
+	•	语言下拉（Language）
+	•	“Login / Orders”（文本按钮）
+	•	“Share” 按钮（调用 navigator.share；fallback 复制链接）
+
+国家/语言切换仅影响文案与国家上下文；价格始终以 USD 展示（见第 5 节）。
+
+2.2 Hero 首屏
+	•	标语：Factory-direct. Crowd-powered.
+	•	地区文案：Group-buy EVs for {CountryName}（随国家切换）
+	•	四格概览：Open / Lock / Ship / Arrive 日期（可来自后端或本地配置）
+	•	拼团进度条：默认进度动画到当前百分比；下方显示 Joined x/y · Need n
+	•	参与头像：用文本圆形（例如 “MX / CD / JG”），不要用图片。
+	•	CTA：
+	•	主按钮：Join Now • Save $X（Group 默认高亮）
+	•	次按钮：Buy 1–4 (Solo)
+	•	倒计时：显示至 Lock 时间；到期自动灰化“Join”。
+
+2.3 类目吸顶筛选条
+	•	置于 Header 下方，粘性；含四个 Chip：3-Wheel Cargo / 2-Wheel Electric / Batteries / Parts。
+	•	点击滚动到对应区块，并点亮当前 Chip。
+
+2.4 类目区块（四个）
+	•	每个区块标题：{Category Name} — Top for {CountryName}。
+	•	每个类目恰好渲染 6 张产品卡（不足则用 DEMO 卡补齐并标记 DEMO 文本筹码）。
+
+2.5 产品卡（核心规格）
+	•	头图：16:9，object-fit: cover；无图则CSS 占位（渐变 + 中心两行文本）。
+	•	标题：产品名（两行省略）+ 规格副标题（电压/时速/续航一行）。
+	•	价格区（仅 USD；两块大价签）
+	•	两块模块：Solo 与 Group，看起来像两个大按钮，二选一。
+	•	默认高亮：Group（金色背景/边框 + 粗体主价）。
+	•	点击哪个就高亮哪个，并联动下方主价与主 CTA。
+	•	Unavailable 模式（若有）置灰并显示 “Unavailable”。
+	•	主价展示（随选择更新）：
+	•	上：Group price / Solo price
+	•	大字：$2,649（USD，无其它币种）
+	•	划线 MSRP $3,499（若有）
+	•	筹码：
+	•	选 Group：Save $X vs MSRP（如果有 MSRP）+ Save $Y vs Solo（若 Solo>Group）
+	•	选 Solo：Save $Z vs MSRP（如果有 MSRP）
+	•	拼团状态：进度条、Joined x/y、Need n more、Lock in 2d 14h（<7 天显示黄色滴答提示）。
+	•	CTA：
+	•	主：Join Group（group 选中）或 Buy 1–4 (Solo)（solo 选中）
+	•	次：Details（跳详情页）
+	•	可用性：若 availability.countries 不含当前国家，显示 Not available in {code}，禁用 Join/Buy，仅保留 Details。
+
+2.6 Why VoltRally / 信任区
+	•	纯文本筹码（不用图标）：Factory-direct / Crowd-powered / 2-year warranty / Docs ready (UN38.3/MSDS/CE)
+	•	可追加：Refund policy、TT verification、Overseas warehouse ready（未来）
+
+2.7 滚动订单条（底部固定）
+	•	文本条滚动：[MX] Diego joined MX-203 ×2, Brenda paid TT ×1 …
+	•	本地 DEMO 数据 + 可选后端 /orders/ticker；断网也显示本地条目。
+
+2.8 页脚
+	•	简短版权 + 链接（Terms / Refund / Shipping）。
+	•	一行文案：World’s first EV group-buying platform.
+
+⸻
+
+3. 目录与资源
+
+dist/
+  index.html
+  assets/
+    data/
+      locales.json                 ← 国家/语言清单（enabled 切换）
+      homepage-products.json       ← 4 类目 × 每类 6 个产品（离线）
+      ticker.json                  ← 滚动订单 DEMO
+  js/
+    locale.js                      ← 国家/语言状态，事件：vr:locale-change
+    homepage-products.js           ← 渲染 + 交互（价格切换/进度/倒计时/CTA）
+    ticker.js                      ← 滚动订单
+    debug.js                       ← ?debug=1 面板
+  css/
+    base.css                       ← 主题、排版、栅格（可内联）
+    homepage.css                   ← 首页特有样式（含价格区模块）
+  docs/
+    api-contracts.md               ← 后端接口契约（见第 6 节）
+    test-plan-homepage.md          ← 自检用例（见第 8 节）
+    dod-checklist.md               ← 验收清单（见第 9 节）
+
+
+⸻
+
+4. 数据模型与离线样例
+
+4.1 国家/语言（assets/data/locales.json）
+	•	仅用于国家/语言文案与可售范围判定；不参与价格换算（价格永远 USD）。
+
+{
+  "defaults": { "country": "MX", "lang": "es-MX" },
+  "countries": [
+    { "code": "MX", "name": "Mexico", "langs": ["es-MX","en"], "enabled": true },
+    { "code": "CO", "name": "Colombia", "langs": ["es-CO","en"], "enabled": true },
+    { "code": "BR", "name": "Brazil", "langs": ["pt-BR","en"], "enabled": true },
+    { "code": "EG", "name": "Egypt", "langs": ["ar-EG","en"], "enabled": true },
+    { "code": "NG", "name": "Nigeria", "langs": ["en-NG"], "enabled": true },
+    { "code": "PH", "name": "Philippines", "langs": ["en","fil"], "enabled": true }
+    // ……可继续加，至少 12–16 个
+  ]
+}
+
+4.2 首页产品（assets/data/homepage-products.json）
+	•	4 类目 × 每类 6 个，字段不可缺；unitsPerContainer/targetUnits 可按产品差异设置。
+
+{
+  "categories": [
+    {
+      "id": "cargo-3w",
+      "name": "3-Wheel Cargo",
+      "items": [
+        {
+          "id": "CT400-A",
+          "name": "Cargo Trike 400kg",
+          "subtitle": "72V 60Ah · 38–45 km/h · 70–80 km",
+          "images": [],                       // 无图则走占位
+          "pricing": { "msrpUSD": 3499, "soloUSD": 2999, "groupUSD": 2649 },
+          "grouping": {
+            "containerType": "20GP",
+            "unitsPerContainer": 36,
+            "targetUnits": 36,
+            "joinedUnits": 28,
+            "lockAt": "2025-10-16T23:59:59Z",
+            "shipAt": "2025-10-18T12:00:00Z",
+            "arriveAt": "2025-11-25T12:00:00Z",
+            "batchCode": "MX-203"
+          },
+          "availability": { "countries": ["MX","CO"], "solo": true, "group": true },
+          "warrantyYears": 2,
+          "tags": ["delivery","cargo"],
+          "detailUrl": "/product/ct400.html?id=CT400-A",
+          "joinUrl": "/checkout.html?sku=CT400-A&mode=group"
+        }
+        // ……同类再 5 个，另外 3 类各 6 个
+      ]
+    }
+  ]
+}
+
+
+⸻
+
+5. 关键交互逻辑（必须实现）
+
+5.1 国家/语言状态（js/locale.js）
+	•	初始化顺序：localStorage → URL 参数（?country=MX&lang=en）→ IP（可选）→ defaults。
+	•	触发事件：
+window.dispatchEvent(new CustomEvent('vr:locale-change', { detail: {country, lang} }))
+	•	切换后：
+	•	Hero 标题、类目标题中的国家名称更新；
+	•	产品可售判定（availability.countries）刷新；
+	•	价格不变（始终 USD）。
+
+5.2 产品卡价格区（USD、两块大价签）
+	•	计算：
+	•	saveVsMsrpGroup = max(msrpUSD - groupUSD, 0)
+	•	saveVsMsrpSolo  = max(msrpUSD - soloUSD,  0)
+	•	extraSaveGroup  = max(soloUSD  - groupUSD,0)
+	•	交互：
+	•	默认选中 Group（若 availability.group=false 则选 Solo；若都 false 全禁用）。
+	•	点击模块 → 高亮为黄色，更新主价与主 CTA 文案/动作。
+	•	可访问性：
+	•	容器 role="radiogroup"，两模块 role="radio"；aria-checked 随状态更新；键盘左右切换。
+
+5.3 拼团进度与倒计时
+	•	进度条 = joinedUnits / targetUnits * 100%。
+	•	文案：Joined x/y · Need n more。
+	•	倒计时至 lockAt，到点禁用 Join 并显示 Closed。
+
+5.4 类目吸顶筛选
+	•	点击 Chip → 平滑滚动定位；当前 Chip 加 active。
+	•	进入某区块（IntersectionObserver）→ 自动点亮对应 Chip。
+
+5.5 滚动订单条
+	•	默认读取 assets/data/ticker.json；如有后端 /orders/ticker 则优先后端。
+	•	断网/失败仍滚动本地 DEMO 列表。
+
+5.6 Debug 面板（?debug=1）
+	•	显示：当前国家/语言；每类渲染数量（应为 6）；错误日志（接口/解析）；锁单临近提醒汇总。
+	•	默认隐藏，?debug=1 时显示一个可收起面板。
+
+⸻
+
+6. 预留后端接口（首页侧用到的）
+
+首页必须在无后端时也正常工作；有后端时优先使用后端数据。
+
+	•	GET /homepage?country=MX&lang=en
+	•	返回结构与 homepage-products.json 一致（可以只返回有货类目/商品）。
+	•	204 → 使用本地 JSON；记录到 Debug 面板。
+	•	GET /orders/ticker?country=MX（可选）
+	•	返回最近的加入/付款摘要，用于滚动条。
+	•	GET /schedule?country=MX（可选）
+	•	返回 Hero 的 Lock/Ship/Arrive 推荐日期；无则用本地默认。
+
+⸻
+
+7. 性能与可访问性
+	•	首屏渲染目标：移动 ≤1.5s（本地 JSON）。
+	•	图片懒加载；无图占位不可留白。
+	•	语义化标签；按钮/链接可键盘操作；焦点清晰；ARIA 详尽。
+	•	控制台不得出现 error（warn/info 可接受）。
+
+⸻
+
+8. 自检用例（交付前必须通过并截图/录屏）
+	1.	国家切换：下拉至少 12 个国家；切换后 Hero 与类目标题更新；商品可售过滤生效；价格不变且为 USD。
+	2.	4×6 渲染：四个区块每区恰好 6 张产品卡；缺少数据用 DEMO 卡补齐并标注“DEMO”。
+	3.	价格切换：任意卡片，点击 Solo/Group，两块大价签黄亮切换，主价/CTA 与节省文案同步变化。
+	4.	节省算法一致：随取 3 张卡，验证 saveVsMsrpGroup/extraSaveGroup/saveVsMsrpSolo 与 UI 文案一致。
+	5.	拼团倒计时：将某卡 lockAt 改成 2 分钟后，倒计时结束自动禁用 Join 并显示 Closed。
+	6.	无图卡：删除 images 数组，卡片展示 CSS 占位不跳版。
+	7.	滚动条：无后端也滚动本地条目；有后端时替换成功。
+	8.	无外链/无图标：全局搜索 <svg>、iconfont、外部 URL 字体/图片，均不存在。
+	9.	控制台：全流程无 error。
+
+⸻
+
+9. Definition of Done（验收清单）
+	•	可离线打开 index.html，完整交互可用。
+	•	国家≥12、类目=4、每类=6；两块价签切换顺畅。
+	•	所有价格为 USD；没有任何其它币种痕迹。
+	•	自检用例全通过；docs/test-plan-homepage.md 与 docs/api-contracts.md 一并提交。
+	•	?debug=1 面板可显示数据来源/错误，无红色报错。
+
+⸻
+
+10. 实施顺序（给开发的执行步骤）
+	1.	骨架搭建：index.html + base.css/homepage.css + 页面区块挂载点。
+	2.	国家/语言模块：locale.js（仅文案/可售判定，价格不动）。
+	3.	类目与产品渲染：用 homepage-products.json 渲染 4×6，带占位图。
+	4.	价格区（两块大价签）：实现切换逻辑与 USD 文案；连通 CTA。
+	5.	进度/倒计时/锁定：进度条与计时，灰化 Join。
+	6.	吸顶筛选与滚动定位：Chip 与区块联动。
+	7.	滚动订单条：先接本地，再接可选后端。
+	8.	Debug 面板：?debug=1 逻辑与错误捕获。
+	9.	无障碍/键盘：radio 组行为、焦点态。
+	10.	自检 + 截图/录屏：按第 8 节输出证据。
+
+⸻
+
+重要禁止项（再次强调）
+	•	任何图标/第三方库/外链资源一律禁止。
+	•	硬编码 3 个国家禁止；必须由 locales.json 驱动。
+	•	缺图留白禁止；必须显示占位。
+	•	价格出现非 USD禁止。
+	•	节省金额与算法不一致禁止上线。
+

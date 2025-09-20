@@ -1,0 +1,339 @@
+/* Enhanced Price Selection Styles */
+/* 价格选择交互增强样式 */
+
+/* 价格选择容器改进 */
+.pricing-container {
+    display: flex;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-lg);
+    position: relative;
+}
+
+/* 价格选项改为可点击 */
+.price-option {
+    flex: 1;
+    padding: var(--spacing-md);
+    border: 2px solid var(--line-color);
+    border-radius: var(--radius-md);
+    text-align: center;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    position: relative;
+    background-color: var(--panel-bg);
+    user-select: none;
+}
+
+/* 悬停效果 */
+.price-option:hover {
+    border-color: var(--gold-primary);
+    background-color: var(--panel-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.1);
+}
+
+/* Group价格选中状态 */
+.price-option.group-price.selected {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(245, 192, 68, 0.1));
+    border-color: var(--gold-primary);
+    border-width: 2px;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+/* Solo价格选中状态 */
+.price-option.solo-price.selected {
+    background-color: var(--panel-hover);
+    border-color: var(--text-primary);
+    border-width: 2px;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+}
+
+/* 选中指示器 */
+.price-option.selected::before {
+    content: '✓';
+    position: absolute;
+    top: var(--spacing-xs);
+    right: var(--spacing-xs);
+    width: 20px;
+    height: 20px;
+    background: var(--gold-gradient);
+    color: var(--text-inverse);
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    animation: checkmarkIn 0.3s ease;
+}
+
+@keyframes checkmarkIn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* 价格标签优化 */
+.price-label {
+    display: block;
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-xs);
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.price-option.selected .price-label {
+    color: var(--text-primary);
+}
+
+.group-price.selected .price-label {
+    color: var(--gold-primary);
+}
+
+/* 价格数值强调 */
+.price-value {
+    display: block;
+    font-size: var(--font-size-xl);
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+    margin-bottom: var(--spacing-xs);
+}
+
+.price-option.selected .price-value {
+    font-size: var(--font-size-2xl);
+    animation: priceScale 0.3s ease;
+}
+
+@keyframes priceScale {
+    0% {
+        transform: scale(0.95);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.group-price.selected .price-value {
+    color: var(--gold-primary);
+    background: var(--gold-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* 节省金额标签 */
+.price-save {
+    display: inline-block;
+    font-size: var(--font-size-xs);
+    color: var(--success);
+    margin-top: var(--spacing-xs);
+    font-weight: 600;
+    padding: 2px 8px;
+    background: rgba(74, 222, 128, 0.1);
+    border-radius: var(--radius-sm);
+    animation: none;
+}
+
+.price-option.selected .price-save {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* 价格切换时的过渡效果 */
+.price-option {
+    transform-origin: center;
+}
+
+.price-option.switching {
+    animation: switchPrice 0.3s ease;
+}
+
+@keyframes switchPrice {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(0.95);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* 价格模式指示器 */
+.product-card::before {
+    content: attr(data-price-mode);
+    position: absolute;
+    top: var(--spacing-md);
+    left: var(--spacing-md);
+    padding: 4px 12px;
+    background: var(--gold-gradient);
+    color: var(--text-inverse);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: var(--radius-sm);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+    z-index: 2;
+}
+
+.product-card[data-price-mode="GROUP"]::before {
+    opacity: 1;
+}
+
+/* 按钮状态联动 */
+.btn-card-primary {
+    transition: all var(--transition-base);
+}
+
+.btn-card-primary[data-mode="solo"] {
+    background: var(--panel-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--gold-primary);
+}
+
+.btn-card-primary[data-mode="solo"]:hover {
+    background: var(--gold-gradient);
+    color: var(--text-inverse);
+    border-color: transparent;
+}
+
+/* 不可点击状态 */
+.price-option.disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* 价格比较提示 */
+.price-compare-tooltip {
+    position: absolute;
+    bottom: calc(100% + var(--spacing-sm));
+    left: 50%;
+    transform: translateX(-50%);
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--panel-bg);
+    border: 1px solid var(--gold-primary);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-xs);
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-fast);
+    z-index: 10;
+}
+
+.price-compare-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid var(--gold-primary);
+}
+
+.price-option:hover .price-compare-tooltip {
+    opacity: 1;
+}
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+    .pricing-container {
+        gap: var(--spacing-xs);
+    }
+
+    .price-option {
+        padding: var(--spacing-sm);
+    }
+
+    .price-value {
+        font-size: var(--font-size-lg);
+    }
+
+    .price-option.selected .price-value {
+        font-size: var(--font-size-xl);
+    }
+
+    .price-label {
+        font-size: 10px;
+    }
+
+    .price-save {
+        font-size: 10px;
+        padding: 1px 6px;
+    }
+}
+
+/* 价格加载动画 */
+.price-loading {
+    position: relative;
+    overflow: hidden;
+}
+
+.price-loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(212, 175, 55, 0.1),
+        transparent
+    );
+    animation: shimmer 1.5s infinite;
+}
+
+/* 价格更新动画 */
+@keyframes priceUpdate {
+    0% {
+        transform: rotateX(0);
+    }
+    50% {
+        transform: rotateX(90deg);
+    }
+    100% {
+        transform: rotateX(0);
+    }
+}
+
+.price-value.updating {
+    animation: priceUpdate 0.5s ease;
+}
+
+/* Focus样式优化 */
+.price-option:focus-visible {
+    outline: 2px solid var(--gold-primary);
+    outline-offset: 2px;
+}
+
+/* 高对比度模式支持 */
+@media (prefers-contrast: high) {
+    .price-option.selected {
+        border-width: 3px;
+    }
+
+    .price-option.selected::before {
+        font-weight: 900;
+    }
+}

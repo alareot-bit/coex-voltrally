@@ -1,0 +1,208 @@
+
+
+Ⅱ-B. 付款（TT 上传）payment-tt.html — 开发文档 v1.0
+
+定位：用户已在 checkout.html 生成订单草单，来到本页完成 线下 TT 水单上传 与确认。
+路径：/pages/payment-tt.html?orderId=<id>&country=<ISO2>&lang=<i18n>
+
+1) 页面目标
+	•	展示订单应付总额、币种、批次关键时间；
+	•	显示收款银行信息（按国家配置）；
+	•	支持上传/替换 TT 水单（jpg/png/pdf ≤10MB），并提交审核；
+	•	支持复制账户信息、下载本订单对账单/形式发票（若有）。
+
+2) 信息架构（在原稿上补字段）
+	•	页头（沿用全站）：LOGO、国家/语言切换、Share
+	•	订单摘要卡（右侧或上方，PC 吸顶，移动吸底）：
+	•	Order ID（大号）/ 状态 pending_tt
+	•	You Pay（大号）+ 货币
+	•	批次节点（Lock/Ship/Arrive）+ 倒计时到 Lock
+	•	收款信息卡（按国家配置）
+	•	Account Name / Bank / SWIFT / Account No / Routing（可选）
+	•	Payment Reference = OrderId（强提示：转账请务必填写备注）
+	•	“一键复制”按钮（对每行 & 对整卡）
+	•	TT 水单上传卡
+	•	拖拽/点击上传，文件名展示、大小校验、类型校验
+	•	预览（图片内嵌 / PDF 用图标+文件名）
+	•	“替换文件”/“删除文件”
+	•	提交（Submit for Verification） 按钮
+	•	常见问题/注意（灰底小字，链接到政策页）
+
+3) 交互（data-attributes）
+	•	data-action="copy-field"（data-key=bankName|swift|account|routing|all）
+	•	data-action="upload-tt"（input[type=file] 触发）
+	•	data-action="replace-tt" / data-action="remove-tt"
+	•	data-action="submit-tt"（提交审核）
+	•	data-action="view-pi"（形式发票；如无则隐藏）
+	•	data-action="back-order"（返回订单页）
+
+微动效
+	•	复制成功 → 右上 toast
+	•	上传成功 → 卡片淡入预览
+	•	提交成功 → 弹出成功层 + 2s 后跳转订单页
+
+4) 数据契约
+
+4.1 订单/银行信息（进入页首次加载）
+
+GET /api/payment/tt/info?orderId=VR-20250906-0012
+
+{
+  "orderId":"VR-20250906-0012",
+  "status":"pending_tt",
+  "currency":"USD",
+  "payable":8097,
+  "batch":{"id":"MX-203","lockAt":"2025-09-24T23:59:59Z","shipAt":"2025-09-26T12:00:00Z","arriveAt":"2025-11-08T12:00:00Z"},
+  "bank":{
+    "accountName":"VOLTRALLY LTD",
+    "bankName":"HSBC China",
+    "swift":"HBCNxxxx",
+    "accountNo":"1234 5678 9999",
+    "routing": null,
+    "note":"Use Order ID as reference"
+  },
+  "docs":{"proformaInvoice":"files/pi/VR-20250906-0012.pdf","ttSlip":null}
+}
+
+4.2 上传水单
+
+POST /api/payment/tt/upload（multipart，字段：orderId, file）
+Response
+
+{"status":"pending_verify","ttSlip":"files/tt/VR-20250906-0012.pdf"}
+
+4.3 提交审核
+
+POST /api/payment/tt/submit（json）
+
+{"orderId":"VR-20250906-0012"}
+
+Response
+
+{"status":"verifying"}
+
+说明：若你们希望上传即提交，可合并 4.2/4.3，前端保留两个动作名不变。
+
+5) 校验与错误
+	•	仅允许 jpg/png/pdf，≤ 10MB；超限/类型错 → 红字 + toast
+	•	未上传时禁用“提交审核”
+	•	API 错误 → toast + 重试按钮
+	•	倒计时到 Lock=0：提示“当前批次已锁定，TT 审核通过后自动顺延至下一批次”或“请联系人工”。
+
+6) i18n 关键键
+	•	tt.title, tt.summary.you_pay, tt.bank.title, tt.bank.copy_ok, tt.upload.title, tt.upload.replace, tt.submit, tt.success, tt.failed
+
+7) QA 清单
+	•	视觉不改版；黑金统一
+	•	复制字段 & 全卡复制均有效
+	•	校验规则正确，上传/替换/删除无异常
+	•	提交后状态从 pending_tt→verifying
+	•	2s 跳转 order.html?orderId=... 可关闭
+	•	移动端吸底摘要不挡表单
+
+⸻
+
+Ⅲ. 订单/追踪 order.html — 开发文档 v1.0
+
+定位：用户查看订单状态、批次节点、物流流转、拼柜进度、文件与售后。
+路径：/pages/order.html?orderId=<id>&country=<ISO2>&lang=<i18n>
+
+1) 页面目标
+	•	一页覆盖状态概览 + 批次时间轴 + 拼单进度 + 物流节点 + 订单明细 + 文件；
+	•	支持轮询或 SSE（后期替换）；
+	•	支持重新上传水单、下载发票/对账单、联系客服。
+
+2) 信息架构（在原稿上补字段）
+	•	订单抬头：OrderId（大号）+ 创建时间 + 状态 Pill（pending_tt | verifying | confirmed | to_port | on_vessel | customs | ready_pickup | completed | canceled）
+	•	金额盒：应付/已付/待付（大号应付），币种
+	•	批次时间轴：Open/Lock/Ship/Arrive（与详情/付款一致），当前节点高亮
+	•	拼单进度条：Joined/Target + Need，头像圈（匿名/国旗）
+	•	物流追踪卡
+	•	节点列表：ready_factory → to_port → on_vessel → arrive_port → customs → ready_pickup/delivery → completed
+	•	每条：时间戳、说明（后台填）、可展开查看详细备注/附件
+	•	订单明细卡
+	•	行：缩略图、标题+变体、模式（Group/Solo）、数量、单价、小计
+	•	费用拆分：Factory / Freight Split / Fees / Total
+	•	文件卡
+	•	TT 水单：预览、重新上传
+	•	发票/对账单（就绪后显示下载按钮）
+	•	客服入口（悬浮按钮）：WhatsApp / Email
+
+3) 交互（data-attributes）
+	•	data-action="refresh"（手动刷新；默认 15s 轮询）
+	•	data-action="reupload-tt"（触发上传；沿用 TT 上传接口）
+	•	data-action="download-invoice" / data-action="download-doc"
+	•	data-action="contact-wa"（打开 WA）
+	•	data-action="toggle-log-item"（展开物流节点详情）
+
+轮询策略
+	•	初始 GET /api/order/:id；每 15s 轮询一次（或收到状态 ∈ completed|canceled 自动停止）；
+	•	失败 → 指数退避（15s→30s→60s，上限 120s），显示“恢复连接中”。
+
+4) 数据契约
+
+GET /api/order/:id
+
+{
+  "orderId":"VR-20250906-0012",
+  "createdAt":"2025-09-06T09:20:00Z",
+  "status":"verifying",
+  "currency":"USD",
+  "amount":{"payable":8097,"paid":0,"due":8097},
+  "batch":{
+    "id":"MX-203","country":"MX","container":"20GP",
+    "seatTarget":36,"seatJoined":32,
+    "timeline":{"openAt":"...","lockAt":"...","shipAt":"...","arriveAt":"..."}
+  },
+  "lines":[
+    {"variantId":"v_72v45_white","label":"72V 45Ah · White","mode":"group","qty":2,"unitPrice":2649,"thumb":"assets/img/ct400_white_1.webp"}
+  ],
+  "charges":{"factory":7497,"freight":600,"fees":0,"total":8097},
+  "logistics":[
+    {"code":"ready_factory","time":"2025-09-08T10:20:00Z","note":"QC passed"},
+    {"code":"to_port","time":null,"note":""},
+    {"code":"on_vessel","time":null,"note":""}
+  ],
+  "docs":{"ttSlip":"files/tt/VR-20250906-0012.pdf","invoice":null,"packingList":null},
+  "support":{"wa":"+86-138xxxx","email":"support@voltrally.com"}
+}
+
+状态映射（UI 用）：
+pending_tt→“待上传水单”、verifying→“财务核验中”、confirmed→“已确认待出厂”、to_port→“在途至港口”、on_vessel→“海上运输中”、customs→“清关中”、ready_pickup→“可提货/派送”、completed→“已完成”、canceled→“已取消”。
+
+5) 校验与错误
+	•	订单不存在 → 空态 + 返回首页/客服
+	•	文件缺失 → 灰掉下载按钮
+	•	轮询超时 → 顶部黄条提示，手动刷新可强制拉取
+	•	倒计时到 Lock=0：若仍 pending_tt，提示“本批次锁仓，TT 审核通过后顺延下一批次”
+
+6) i18n 关键键
+	•	o.title, o.status.pending_tt, o.status.verifying, …
+	•	o.amount.payable, o.amount.paid, o.amount.due
+	•	o.batch.joined, o.batch.need_more, o.logs.title, o.files.title, o.files.invoice, o.files.tt_slip, o.support.title
+
+7) QA 清单
+	•	视觉与黑金体系一致（组件/间距/阴影）
+	•	状态 pill 与时间轴同步正确
+	•	进度条与 Need 与批次 seat 同步
+	•	轮询/退避/失败回退行为正确
+	•	TT 重新上传可用，文件大小/类型校验生效
+	•	移动端布局不抖动，悬浮客服不遮挡主要 CTA
+
+⸻
+
+Ⅳ. 三页共同规范（补充）
+
+1) 目录与资源
+	•	图片**全部用你的“设计文件/图片/logo”**目录拷贝到 /assets/img；禁止外链。
+	•	CSS/JS 统一：/assets/css/theme.css、/assets/js/app.js、/assets/js/data-loader.js。
+	•	所有事件靠 data-action 绑定，禁止改 DOM 结构与视觉类名。
+
+2) 性能/可访问性
+	•	懒加载图片；首屏脚本 ≤150KB（gzip）；
+	•	键盘可达、aria-* 完整；对比度≥4.5:1；错误提示用 role="alert"。
+
+3) 埋点（新增）
+	•	payment_view, payment_copy_bank, payment_upload, payment_submit
+	•	order_view, order_poll, order_doc_download, order_tt_reupload, order_contact_wa
+

@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoltRally - Factory-direct. Crowd-powered.</title>
+    <link rel="stylesheet" href="assets/css/design-system.css">
+    <link rel="stylesheet" href="assets/css/home.css">
+    <link rel="stylesheet" href="assets/css/home-enhanced.css">
+</head>
+<body>
+    <!-- Header (Sticky) -->
+    <header class="site-header" role="banner">
+        <div class="header-container">
+            <!-- Logo -->
+            <div class="header-logo">
+                <a href="/" aria-label="VoltRally Home">VoltRally</a>
+            </div>
+
+            <!-- Country/Language/Currency Selector -->
+            <div class="header-selector">
+                <button type="button" class="selector-trigger" aria-expanded="false" aria-haspopup="true" data-selector="country">
+                    <span class="selector-country">MX</span>
+                    <span class="selector-name">Mexico</span>
+                    <span class="selector-currency">USD</span>
+                </button>
+                <div class="selector-dropdown" role="menu" aria-hidden="true">
+                    <div class="selector-section">
+                        <div class="selector-label">Country</div>
+                        <select id="country-select" aria-label="Select country">
+                            <option value="MX" selected>Mexico</option>
+                            <option value="EG">Egypt</option>
+                            <option value="NG">Nigeria</option>
+                            <option value="ID">Indonesia</option>
+                            <option value="PH">Philippines</option>
+                            <option value="CO">Colombia</option>
+                            <option value="BR">Brazil</option>
+                            <option value="IN">India</option>
+                            <option value="TH">Thailand</option>
+                            <option value="VN">Vietnam</option>
+                        </select>
+                    </div>
+                    <div class="selector-section">
+                        <div class="selector-label">Language</div>
+                        <select id="language-select" aria-label="Select language">
+                            <option value="EN" selected>English</option>
+                            <option value="ES">Español</option>
+                            <option value="ZH">中文</option>
+                        </select>
+                    </div>
+                    <div class="selector-section">
+                        <div class="selector-label">Currency</div>
+                        <select id="currency-select" aria-label="Select currency">
+                            <option value="USD" selected>USD</option>
+                            <option value="MXN">MXN</option>
+                            <option value="EUR">EUR</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Navigation -->
+            <nav class="header-nav" role="navigation">
+                <button type="button" class="nav-btn" data-action="share">Share</button>
+                <a href="/my-orders.html" class="nav-btn nav-orders">
+                    Orders
+                    <span class="orders-count" data-count="0" style="display:none;">0</span>
+                </a>
+                <button type="button" class="nav-btn" data-action="login">Sign in</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section" role="main">
+        <div class="hero-container">
+            <!-- Country Badge and Tagline -->
+            <div class="hero-header">
+                <div class="country-badge" data-country="MX">Mexico</div>
+                <h1 class="hero-title">Factory-direct. Crowd-powered.</h1>
+                <p class="hero-subtitle">Join thousands saving on electric vehicles through group shipping</p>
+            </div>
+
+            <!-- Timeline and Countdown -->
+            <div class="batch-timeline">
+                <div class="timeline-item active" data-stage="open">
+                    <span class="timeline-label">Open</span>
+                    <span class="timeline-date">Now</span>
+                </div>
+                <div class="timeline-item" data-stage="lock">
+                    <span class="timeline-label">Lock</span>
+                    <span class="timeline-date" data-lock-date="">Sep 24</span>
+                </div>
+                <div class="timeline-item" data-stage="ship">
+                    <span class="timeline-label">Ship</span>
+                    <span class="timeline-date">Sep 27</span>
+                </div>
+                <div class="timeline-item" data-stage="arrive">
+                    <span class="timeline-label">Arrive</span>
+                    <span class="timeline-date">Oct 15</span>
+                </div>
+            </div>
+
+            <!-- Countdown Timer -->
+            <div class="countdown-timer" role="timer" aria-label="Time until batch lock">
+                <div class="countdown-label">Batch locks in:</div>
+                <div class="countdown-display">
+                    <span class="countdown-unit">
+                        <span class="countdown-value" data-days>5</span>
+                        <span class="countdown-text">days</span>
+                    </span>
+                    <span class="countdown-unit">
+                        <span class="countdown-value" data-hours>14</span>
+                        <span class="countdown-text">hours</span>
+                    </span>
+                    <span class="countdown-unit">
+                        <span class="countdown-value" data-minutes>32</span>
+                        <span class="countdown-text">min</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="batch-progress">
+                <div class="progress-stats">
+                    <span class="progress-joined">
+                        <span class="progress-value" data-joined>28</span> joined
+                    </span>
+                    <span class="progress-need">
+                        Need <span class="progress-value" data-need>8</span> more
+                    </span>
+                </div>
+                <div class="progress-bar" role="progressbar" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-fill" style="width: 78%;"></div>
+                </div>
+                <div class="progress-target">Target: <span data-target>36</span> units</div>
+            </div>
+
+            <!-- CTA Buttons -->
+            <div class="hero-cta">
+                <button type="button" class="btn btn-primary" data-action="join-group">
+                    Join Group • Save $600
+                </button>
+                <button type="button" class="btn btn-secondary" data-action="buy-solo">
+                    Buy Solo
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Category Navigation (Sticky) -->
+    <nav class="category-tabs sticky" role="navigation" aria-label="Product categories">
+        <div class="tabs-container">
+            <button type="button" class="tab-item active" data-category="featured">Featured</button>
+            <button type="button" class="tab-item" data-category="3-wheel">3-Wheel Cargo</button>
+            <button type="button" class="tab-item" data-category="2-wheel">2-Wheel Electric</button>
+            <button type="button" class="tab-item" data-category="batteries">Batteries</button>
+            <button type="button" class="tab-item" data-category="parts">Parts & Accessories</button>
+            <button type="button" class="tab-item" data-category="why">Why VoltRally</button>
+        </div>
+    </nav>
+
+    <!-- Featured Products Section -->
+    <section class="products-section" id="featured" data-category="featured">
+        <div class="section-container">
+            <h2 class="section-title">Featured Products</h2>
+            <div class="products-grid" data-grid="products">
+                <!-- Product Card 1 -->
+                <article class="product-card" data-sku="CT400">
+                    <div class="product-image">
+                        <img src="占位图/ee1e5ca380e04272ce692251ad54cb67.jpg"
+                             alt="Cargo Trike 400kg"
+                             loading="lazy">
+                        <div class="product-badge">HOT</div>
+                    </div>
+                    <div class="product-content">
+                        <h3 class="product-name">Cargo Trike 400kg</h3>
+                        <div class="product-specs">72V 45Ah • 40 km/h • 80-90 km</div>
+
+                        <!-- Dual Pricing Display -->
+                        <div class="pricing-container">
+                            <div class="price-option group-price">
+                                <span class="price-label">Group</span>
+                                <span class="price-value">$2,649</span>
+                                <span class="price-save">Save $500</span>
+                            </div>
+                            <div class="price-option solo-price">
+                                <span class="price-label">Solo</span>
+                                <span class="price-value">$3,149</span>
+                            </div>
+                        </div>
+
+                        <!-- Progress Bar -->
+                        <div class="card-progress">
+                            <div class="progress-text">
+                                <span><span data-joined>32</span> joined</span>
+                                <span>Need <span data-need>4</span></span>
+                            </div>
+                            <div class="progress-bar-mini" role="progressbar" aria-valuenow="89" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-fill" style="width: 89%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="product-actions">
+                            <button type="button" class="btn-card-primary" data-action="join" data-sku="CT400">
+                                Join Group
+                            </button>
+                            <button type="button" class="btn-card-secondary" data-action="details" data-sku="CT400">
+                                Details
+                            </button>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Product Card 2 -->
+                <article class="product-card" data-sku="DS250">
+                    <div class="product-image">
+                        <img src="占位图/2d4a4baf2205a10a4e9ef910f670bc03.jpg"
+                             alt="Delivery Scooter 250kg"
+                             loading="lazy">
+                    </div>
+                    <div class="product-content">
+                        <h3 class="product-name">Delivery Scooter 250kg</h3>
+                        <div class="product-specs">60V 32Ah • 45 km/h • 65 km</div>
+
+                        <div class="pricing-container">
+                            <div class="price-option group-price">
+                                <span class="price-label">Group</span>
+                                <span class="price-value">$1,899</span>
+                                <span class="price-save">Save $350</span>
+                            </div>
+                            <div class="price-option solo-price">
+                                <span class="price-label">Solo</span>
+                                <span class="price-value">$2,249</span>
+                            </div>
+                        </div>
+
+                        <div class="card-progress">
+                            <div class="progress-text">
+                                <span><span data-joined>18</span> joined</span>
+                                <span>Need <span data-need>18</span></span>
+                            </div>
+                            <div class="progress-bar-mini" role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-fill" style="width: 50%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="product-actions">
+                            <button type="button" class="btn-card-primary" data-action="join" data-sku="DS250">
+                                Join Group
+                            </button>
+                            <button type="button" class="btn-card-secondary" data-action="details" data-sku="DS250">
+                                Details
+                            </button>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Product Card 3 -->
+                <article class="product-card" data-sku="EB2000">
+                    <div class="product-image">
+                        <img src="占位图/353f0546ff63e3d046d39982af457400.jpg"
+                             alt="Electric Bike 2000W"
+                             loading="lazy">
+                        <div class="product-badge">NEW</div>
+                    </div>
+                    <div class="product-content">
+                        <h3 class="product-name">Electric Bike 2000W</h3>
+                        <div class="product-specs">72V 20Ah • 55 km/h • 100 km</div>
+
+                        <div class="pricing-container">
+                            <div class="price-option group-price">
+                                <span class="price-label">Group</span>
+                                <span class="price-value">$1,299</span>
+                                <span class="price-save">Save $200</span>
+                            </div>
+                            <div class="price-option solo-price">
+                                <span class="price-label">Solo</span>
+                                <span class="price-value">$1,499</span>
+                            </div>
+                        </div>
+
+                        <div class="card-progress">
+                            <div class="progress-text">
+                                <span><span data-joined>25</span> joined</span>
+                                <span>Need <span data-need>11</span></span>
+                            </div>
+                            <div class="progress-bar-mini" role="progressbar" aria-valuenow="69" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-fill" style="width: 69%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="product-actions">
+                            <button type="button" class="btn-card-primary" data-action="join" data-sku="EB2000">
+                                Join Group
+                            </button>
+                            <button type="button" class="btn-card-secondary" data-action="details" data-sku="EB2000">
+                                Details
+                            </button>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Product Card 4 -->
+                <article class="product-card" data-sku="LFP72">
+                    <div class="product-image">
+                        <img src="占位图/7cc6023a570f7333d44682ffcc6ea793.jpg"
+                             alt="LiFePO4 Battery 72V 45Ah"
+                             loading="lazy">
+                    </div>
+                    <div class="product-content">
+                        <h3 class="product-name">LiFePO4 Battery 72V 45Ah</h3>
+                        <div class="product-specs">BMS 100A • 5000 cycles • UN38.3</div>
+
+                        <div class="pricing-container">
+                            <div class="price-option group-price">
+                                <span class="price-label">Group</span>
+                                <span class="price-value">$649</span>
+                                <span class="price-save">Save $150</span>
+                            </div>
+                            <div class="price-option solo-price">
+                                <span class="price-label">Solo</span>
+                                <span class="price-value">$799</span>
+                            </div>
+                        </div>
+
+                        <div class="card-progress">
+                            <div class="progress-text">
+                                <span><span data-joined>42</span> joined</span>
+                                <span>Need <span data-need>36</span></span>
+                            </div>
+                            <div class="progress-bar-mini" role="progressbar" aria-valuenow="54" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-fill" style="width: 54%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="product-actions">
+                            <button type="button" class="btn-card-primary" data-action="join" data-sku="LFP72">
+                                Join Group
+                            </button>
+                            <button type="button" class="btn-card-secondary" data-action="details" data-sku="LFP72">
+                                Details
+                            </button>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Product Card 5 -->
+                <article class="product-card" data-sku="MT350">
+                    <div class="product-image">
+                        <img src="占位图/9e54cbf48291ce4bd5060a6f3643cae7.jpg"
+                             alt="Mountain E-Bike 350W"
+                             loading="lazy">
+                    </div>
+                    <div class="product-content">
+                        <h3 class="product-name">Mountain E-Bike 350W</h3>
+                        <div class="product-specs">48V 15Ah • 35 km/h • 60 km</div>
+
+                        <div class="pricing-container">
+                            <div class="price-option group-price">
+                                <span class="price-label">Group</span>
+                                <span class="price-value">$899</span>
+                                <span class="price-save">Save $200</span>
+                            </div>
+                            <div class="price-option solo-price">
+                                <span class="price-label">Solo</span>
+                                <span class="price-value">$1,099</span>
+                            </div>
+                        </div>
+
+                        <div class="card-progress">
+                            <div class="progress-text">
+                                <span><span data-joined>15</span> joined</span>
+                                <span>Need <span data-need>21</span></span>
+                            </div>
+                            <div class="progress-bar-mini" role="progressbar" aria-valuenow="42" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-fill" style="width: 42%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="product-actions">
+                            <button type="button" class="btn-card-primary" data-action="join" data-sku="MT350">
+                                Join Group
+                            </button>
+                            <button type="button" class="btn-card-secondary" data-action="details" data-sku="MT350">
+                                Details
+                            </button>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Product Card 6 -->
+                <article class="product-card" data-sku="CS500">
+                    <div class="product-image">
+                        <img src="占位图/aafee54c0eb64305765b0b15e1daeeee.jpg"
+                             alt="City Scooter 500W"
+                             loading="lazy">
+                        <div class="product-badge">-15%</div>
+                    </div>
+                    <div class="product-content">
+                        <h3 class="product-name">City Scooter 500W</h3>
+                        <div class="product-specs">48V 12Ah • 25 km/h • 40 km</div>
+
+                        <div class="pricing-container">
+                            <div class="price-option group-price">
+                                <span class="price-label">Group</span>
+                                <span class="price-value">$599</span>
+                                <span class="price-save">Save $100</span>
+                            </div>
+                            <div class="price-option solo-price">
+                                <span class="price-label">Solo</span>
+                                <span class="price-value">$699</span>
+                            </div>
+                        </div>
+
+                        <div class="card-progress">
+                            <div class="progress-text">
+                                <span><span data-joined>33</span> joined</span>
+                                <span>Need <span data-need>3</span></span>
+                            </div>
+                            <div class="progress-bar-mini" role="progressbar" aria-valuenow="92" aria-valuemin="0" aria-valuemax="100">
+                                <div class="progress-fill pulse" style="width: 92%;"></div>
+                            </div>
+                        </div>
+
+                        <div class="product-actions">
+                            <button type="button" class="btn-card-primary" data-action="join" data-sku="CS500">
+                                Join Group
+                            </button>
+                            <button type="button" class="btn-card-secondary" data-action="details" data-sku="CS500">
+                                Details
+                            </button>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3-Wheel Cargo Section -->
+    <section class="products-section" id="3-wheel" data-category="3-wheel">
+        <div class="section-container">
+            <h2 class="section-title">3-Wheel Cargo Vehicles</h2>
+            <p class="section-subtitle">Heavy-duty electric cargo trikes for commercial use</p>
+            <div class="products-grid" data-grid="3-wheel">
+                <!-- Will be populated by JavaScript -->
+            </div>
+            <div class="section-footer">
+                <a href="/category/3-wheel.html" class="link-viewall">View All 3-Wheel Cargo</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2-Wheel Electric Section -->
+    <section class="products-section" id="2-wheel" data-category="2-wheel">
+        <div class="section-container">
+            <h2 class="section-title">2-Wheel Electric</h2>
+            <p class="section-subtitle">Electric motorcycles and scooters for every need</p>
+            <div class="products-grid" data-grid="2-wheel">
+                <!-- Will be populated by JavaScript -->
+            </div>
+            <div class="section-footer">
+                <a href="/category/2-wheel.html" class="link-viewall">View All 2-Wheel Electric</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Batteries Section -->
+    <section class="products-section" id="batteries" data-category="batteries">
+        <div class="section-container">
+            <h2 class="section-title">Batteries</h2>
+            <p class="section-subtitle">LiFePO4 and Lithium-ion battery packs</p>
+            <div class="products-grid" data-grid="batteries">
+                <!-- Will be populated by JavaScript -->
+            </div>
+            <div class="section-footer">
+                <a href="/category/batteries.html" class="link-viewall">View All Batteries</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Parts & Accessories Section -->
+    <section class="products-section" id="parts" data-category="parts">
+        <div class="section-container">
+            <h2 class="section-title">Parts & Accessories</h2>
+            <p class="section-subtitle">Motors, controllers, and upgrade parts</p>
+            <div class="products-grid" data-grid="parts">
+                <!-- Will be populated by JavaScript -->
+            </div>
+            <div class="section-footer">
+                <a href="/category/parts.html" class="link-viewall">View All Parts</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why VoltRally Section -->
+    <section class="why-section" id="why" data-category="why">
+        <div class="section-container">
+            <h2 class="section-title">Why VoltRally</h2>
+            <div class="why-grid">
+                <div class="why-item">
+                    <h3 class="why-title">Factory-direct Pricing</h3>
+                    <p class="why-text">Skip middlemen and dealers. Get genuine factory prices directly from manufacturers with full transparency on costs.</p>
+                </div>
+                <div class="why-item">
+                    <h3 class="why-title">Group Shipping Savings</h3>
+                    <p class="why-text">Share container space with other buyers. Split shipping costs fairly and save hundreds compared to individual shipping.</p>
+                </div>
+                <div class="why-item">
+                    <h3 class="why-title">Quality Assurance</h3>
+                    <p class="why-text">2-year warranty on core components. All products certified with UN38.3, MSDS, and CE documentation for safe transport.</p>
+                </div>
+                <div class="why-item">
+                    <h3 class="why-title">Clear Timeline</h3>
+                    <p class="why-text">Track your batch from Open to Lock to Ship to Arrive. Real-time updates and countdown timers keep you informed.</p>
+                </div>
+            </div>
+
+            <!-- Community Savings Display -->
+            <div class="community-stats">
+                <div class="stat-item">
+                    <span class="stat-value" data-stat="saved">$487,290</span>
+                    <span class="stat-label">Total Community Saved</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" data-stat="shipments">142</span>
+                    <span class="stat-label">Successful Shipments</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-value" data-stat="members">3,847</span>
+                    <span class="stat-label">Happy Members</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Compliance Documents Section -->
+    <section class="compliance-section">
+        <div class="section-container">
+            <h2 class="section-title">Compliance & Documentation</h2>
+            <div class="compliance-grid">
+                <button type="button" class="compliance-item" data-doc="un38.3">
+                    <span class="compliance-label">UN38.3</span>
+                    <span class="compliance-text">Battery Transport Certification</span>
+                </button>
+                <button type="button" class="compliance-item" data-doc="msds">
+                    <span class="compliance-label">MSDS</span>
+                    <span class="compliance-text">Material Safety Data Sheet</span>
+                </button>
+                <button type="button" class="compliance-item" data-doc="ce">
+                    <span class="compliance-label">CE</span>
+                    <span class="compliance-text">European Conformity</span>
+                </button>
+                <button type="button" class="compliance-item" data-doc="invoice">
+                    <span class="compliance-label">Proforma</span>
+                    <span class="compliance-text">Invoice Template</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Order Ticker -->
+    <div class="order-ticker" role="complementary" aria-label="Recent orders">
+        <div class="ticker-track" data-ticker="orders">
+            <div class="ticker-item">
+                <span class="ticker-country">MX</span>
+                <span class="ticker-text">Diego joined CT400 batch</span>
+                <span class="ticker-time">2 min ago</span>
+            </div>
+            <div class="ticker-item">
+                <span class="ticker-country">CO</span>
+                <span class="ticker-text">Maria paid for DS250</span>
+                <span class="ticker-time">5 min ago</span>
+            </div>
+            <div class="ticker-item">
+                <span class="ticker-country">BR</span>
+                <span class="ticker-text">Carlos joined EB2000 batch</span>
+                <span class="ticker-time">8 min ago</span>
+            </div>
+            <div class="ticker-item">
+                <span class="ticker-country">MX</span>
+                <span class="ticker-text">Ana paid for LFP72</span>
+                <span class="ticker-time">12 min ago</span>
+            </div>
+            <div class="ticker-item">
+                <span class="ticker-country">EG</span>
+                <span class="ticker-text">Ahmed joined CT400 batch</span>
+                <span class="ticker-time">15 min ago</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="site-footer" role="contentinfo">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h4 class="footer-title">VoltRally</h4>
+                <p class="footer-text">Factory-direct. Crowd-powered.</p>
+                <p class="footer-text">The world's largest electric vehicle group-buying platform.</p>
+            </div>
+            <div class="footer-section">
+                <h4 class="footer-title">Categories</h4>
+                <nav class="footer-nav">
+                    <a href="/category/3-wheel.html">3-Wheel Cargo</a>
+                    <a href="/category/2-wheel.html">2-Wheel Electric</a>
+                    <a href="/category/batteries.html">Batteries</a>
+                    <a href="/category/parts.html">Parts & Accessories</a>
+                </nav>
+            </div>
+            <div class="footer-section">
+                <h4 class="footer-title">Support</h4>
+                <nav class="footer-nav">
+                    <a href="/shipping-policy.html">Shipping Policy</a>
+                    <a href="/refund-policy.html">Refund Policy</a>
+                    <a href="/warranty.html">Warranty</a>
+                    <a href="/contact.html">Contact Us</a>
+                </nav>
+            </div>
+            <div class="footer-section">
+                <h4 class="footer-title">Account</h4>
+                <nav class="footer-nav">
+                    <a href="/login.html">Sign In</a>
+                    <a href="/register.html">Create Account</a>
+                    <a href="/my-orders.html">My Orders</a>
+                    <a href="/my-groups.html">My Groups</a>
+                </nav>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p class="footer-copyright">© 2025 VoltRally. All rights reserved.</p>
+            <div class="footer-legal">
+                <a href="/terms.html">Terms of Service</a>
+                <a href="/privacy.html">Privacy Policy</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bottom Toolbar (Mobile) -->
+    <div class="bottom-toolbar" role="navigation" aria-label="Mobile navigation">
+        <button type="button" class="toolbar-item active" data-page="home">
+            <span class="toolbar-label">Home</span>
+        </button>
+        <button type="button" class="toolbar-item" data-page="categories">
+            <span class="toolbar-label">Categories</span>
+        </button>
+        <button type="button" class="toolbar-item" data-page="groups">
+            <span class="toolbar-label">Groups</span>
+            <span class="toolbar-badge" data-groups="3">3</span>
+        </button>
+        <button type="button" class="toolbar-item" data-page="orders">
+            <span class="toolbar-label">Orders</span>
+        </button>
+        <button type="button" class="toolbar-item" data-page="account">
+            <span class="toolbar-label">Account</span>
+        </button>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/store.js"></script>
+    <script src="assets/js/price-selector.js"></script>
+    <script src="assets/js/home.js"></script>
+</body>
+</html>

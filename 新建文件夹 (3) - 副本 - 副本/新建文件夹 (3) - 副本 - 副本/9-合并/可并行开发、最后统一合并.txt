@@ -1,0 +1,255 @@
+现在这个 dist/ 目录已经具备「可并行开发、最后统一合并」的基础。下面我把“首页→详情→下单→TT凭证→订单/物流→账号”整站的一次性优化与合并方案写成可直接 执行的清单（含页面职责、数据模型、交互要点、验收要点与执行顺序）。照这个跑，能把你现有页面 1:1 串起来，再逐步提质到“上线级”。
+
+⸻
+
+0. 目标与边界
+	•	不重新设计：以你“设计文件/页面”的样式为准，1:1 合并还原；所有微交互（黑金、吸顶筛选、进度条、Ripple、倒计时、Solo/Group 切换、滚动定位、Ticker）全部保留。
+	•	静态多页 + 共享核心：继续采用多 HTML 页面，但抽取一套公共 JS/CSS（避免每页重复逻辑）。
+	•	可切换国家/语言/币种 & IP 自定位：先本地模拟（data/geoinfo.json），后端就绪后只换取数接口即可。
+	•	与后端契约：前端先用 data/*.json Mock；接口路径/字段与后端约定后直接切换到接口。
+
+⸻
+
+1. 目录与文件统一（Claude 直接执行）
+
+dist/
+  assets/
+    css/   -> app.css  (抽公共样式)
+    js/    -> app.js   (抽公共交互)
+    img/   -> logo、占位图等
+  data/
+    countries.json     (国家/币种/文案)
+    products.json      (商品主档+变体)
+    categories.json    (分类/二级分类)
+    batches.json       (拼团批次/进度)
+    prices.json        (国家价/汇率)
+    orders.json        (我的订单 mock)
+    user.json          (当前用户 mock)
+  docs/                (验收记录/偏差记录)
+  index.html                 (首页)
+  category-landing.html      (分类落地页：2轮/3轮/电池/配件)
+  product-list.html          (列表页：筛选/排序/分页)
+  product-ct400.html         (详情页：多变体/联动图片/分组信息块)
+  checkout.html              (下单页：地址/发票/支付方式=TT)
+  payment-verification.html  (TT付款核验三步：打款→上传→审核)
+  order-dashboard.html       (单订单：进度、凭证、文档、时间线)
+  my-orders.html             (我的订单：筛选/跳转)
+  account-dashboard.html     (资料/地址/发票抬头/收件人)
+  login.html | register.html | forgot-password.html
+
+✅ Definition of Done（目录层面）
+	•	每个页面只引入 assets/css/app.css 和 assets/js/app.js。
+	•	旧页面里的内联 <style>/<script> 移到公共文件（保留页面少量初始化片段）。
+	•	页面间跳转用真实文件名（相对路径），全部可点击贯通。
+
+⸻
+
+2. 公共组件与交互（抽到 app.js / app.css）
+
+组件（复用到所有页面）
+	•	HeaderBar：Logo + 国家选择（带 IP 自动填充）+ 语言切换 + Share。
+	•	StickyChips：吸顶分类 Chips（点击滚动定位）。
+	•	PriceSwitch：Solo ↔ Group 切换（联动“你付的价”“参考原价”“已省”）。
+	•	ProgressBar：拼团进度（Joined/Need → 宽度/颜色）。
+	•	Countdown：Lock 倒计时（天/时/分）。
+	•	Ripple：按钮波纹。
+	•	Toast/Modal：统一反馈与弹窗。
+	•	Ticker：底部滚动订单动态。
+	•	Stepper：TT 核验 3 步。
+	•	Uploader：图片/PDF 凭证上传 + 预览 + 尺寸/类型校验。
+
+关键交互统一
+	•	芯片滚动定位：data-target + scrollIntoView({ behavior:'smooth' })
+	•	价格切换：读取当前国家币种+产品 groupPrice/soloPrice，动态渲染。
+	•	倒计时：基于批次 lockAt，每秒刷新。
+	•	IP 自定位：优先 localStorage，否则从 data/geoinfo.json（或真实 API）拉取，落地到 window.ctx.locale。
+	•	语言包：i18n[lang].key 简易字典；文本用 data-i18n 标注。
+	•	分享：navigator.share 回退到 clipboard。
+
+✅ Definition of Done（交互层面）
+所有页面的按钮/切换/跳转均可操作，且视觉与「黑金」一致。
+
+⸻
+
+3. 数据模型（前端 Mock → 后端接口可无缝替换）
+
+3.1 国家 / 语言 / 货币（countries.json）
+
+{
+  "MX": { "name":"Mexico", "lang":["es","en"], "currency":"MXN", "fxToUSD":17.1, "flag":"🇲🇽" },
+  "EG": { "name":"Egypt",  "lang":["ar","en"], "currency":"EGP", "fxToUSD":48.3, "flag":"🇪🇬" }
+}
+
+3.2 产品与变体（products.json）
+
+{
+  "ct400": {
+    "id":"ct400","name":"Cargo Trike 400kg","category":"3-wheel",
+    "specs":["72V 45Ah","40 km/h","80–90 km","Payload 400kg"],
+    "variants":[
+      {"sku":"ct400-45a-bed","color":"black","attrs":{"battery":"45Ah","bed":"cargo"},
+       "album":["/assets/img/ct400/black-1.jpg","/assets/img/ct400/black-2.jpg"],
+       "pricing":{"USD":{"solo":3149,"group":2649}}}
+    ]
+  }
+}
+
+3.3 批次/拼团（batches.json）
+
+{
+  "MX-203": {
+    "container":"20GP","seats":36,"joined":32,
+    "openAt":"2025-09-01T00:00:00Z","lockAt":"2025-09-24T16:00:00Z",
+    "shipAt":"2025-09-26T08:00:00Z","arriveAt":"2025-11-08T09:00:00Z"
+  }
+}
+
+3.4 订单（orders.json 简化）
+
+[{
+  "id":"VR-20250906-0012","batch":"MX-203","status":"payment_pending",
+  "items":[{"sku":"ct400-45a-bed","qty":2,"price":2649,"currency":"USD"}],
+  "payment":{"method":"TT","proofUrl":null,"verify":"pending"},
+  "shipping":{"country":"MX","port":"Manzanillo","address":"Av. México 123"},
+  "totals":{"payable":8097,"paid":0,"due":8097,"currency":"USD"}
+}]
+
+✅ Definition of Done（数据层面）
+	•	所有页面只读取 data/*.json（或同结构接口）。
+	•	切换到真实 API 时，只需把 fetchJson('data/...') 换成 /api/...。
+
+⸻
+
+4. 页面职责 & 验收清单（逐页让 Claude 自测）
+
+4.1 index.html（首页）
+	•	要点：Hero 四格时间牌、进度条、Joined/Need、国家/语言切、吸顶 Chips、Trike/2-Wheel/Battery 卡片（PriceSwitch/Progress/Join）。
+	•	验收：
+	•	切国家→文案/币种/价格/Need 同步变更；倒计时正常。
+	•	“Join Group/Details”跳转对应详情页。
+	•	底部 Ticker 连续滚动。
+
+4.2 category-landing.html
+	•	要点：分类 Tabs（2轮/3轮/电池/配件），二级 Chips；列表可排序（销量/进度/价格）。
+	•	验收：Tab/Chips 组合筛选正确；价格随国家变更。
+
+4.3 product-list.html
+	•	要点：栅格卡片+分页；支持 Solo/Group 视图切换（仅展示当前模式价格）。
+	•	验收：任意筛选/排序后分页正常；返回上一页保持状态。
+
+4.4 product-ct400.html（详情页）
+	•	要点：变体颜色切换→主图/相册联动；数量加减；混合型号合单（同商品可选多变体不同数量加入同一个“草稿订单”）；价格/已省实时变。
+	•	验收：
+	•	切换变体图片连动；
+	•	“加入拼团”会把当前选择写入 localStorage.cart；
+	•	页面下方：工厂展示/发货包装/关联产品卡片存在、可跳转。
+
+4.5 checkout.html
+	•	要点：从 localStorage.cart 读取；地址/港口/开票信息；选择支付方式仅保留 TT 电汇；展示应付、已付、待付（币种按国家）；提交后创建订单。
+	•	验收：
+	•	表单校验（手机号/邮箱/港口必填）；
+	•	点击“立即 TT 支付”跳 payment-verification.html?order=ID。
+
+4.6 payment-verification.html（TT 核验）
+	•	要点：3 步 Stepper（1打款→2上传凭证→3等待审核）；支持多张图片/PDF，限制大小/类型；展示银行账号（Copy All）。
+	•	验收：
+	•	上传成功→状态 payment_submitted；
+	•	返回订单页可见 TT Payment Slip: VERIFIED/PENDING 的徽标与链接。
+
+4.7 order-dashboard.html（单订单页）
+	•	要点：时间线（Open/Lock/Ship/Arrive）、拼团进度条、Files & Docs（付款凭证/PI/装箱单/商票）、Need X more 提示；支持“切换到下个批次”申请。
+	•	验收：
+	•	不同状态（待付/核验中/已核验/已装柜/在途/到港）UI 标签变化；
+	•	文档项以占位文件展示，状态 Pending/Ready。
+
+4.8 my-orders.html
+	•	要点：订单列表；状态筛选；跳转单订单页。
+	•	验收：状态统计数字正确。
+
+4.9 账号页 account-dashboard.html / 登录注册忘记密
+	•	要点：基本资料、收货地址、发票抬头；登录/注册/忘记密码表单校验。
+	•	验收：模拟登录后本地保存 user.json，导航显示“我的订单”。
+
+⸻
+
+5. 状态机与文案（避免遗漏）
+
+cart → checkout → order(payment_pending)
+→ payment_submitted(凭证已传) → payment_verifying(人工审核)
+→ payment_verified → batching(等待凑满)
+→ locked → shipped → arrived → completed
+→ 失败分支：payment_rejected / canceled / refunded
+
+✅ 每个状态对应：颜色标签、操作按钮可/禁用、提示文案、下一步 CTA。
+
+⸻
+
+6. 国际化与定价
+	•	检测顺序：localStorage.pref > ?country=MX&lang=es > geoinfo > 默认。
+	•	定价展示：主币种随国家切换；“你支付的价格”统一加粗；保留 “Solo 参考价”/“你已省”。
+	•	汇率：先读取 prices.json 或 countries.fxToUSD 做换算，保留 ~ 近似符号（避免误导）。
+
+⸻
+
+7. 安全/合规与上传
+	•	上传限制：jpg/png/pdf，单文件 ≤ 10MB，最多 5 个；超限给出可见错误。
+	•	隐私：在本地 Mock 阶段不真实上传，走 blob: 预览；切到后端 /api/payments/{id}/proof 时沿用同字段名：files[].
+
+⸻
+
+8. 性能与可维护性
+	•	图片：< img loading="lazy" decoding="async">；大图用 srcset。
+	•	JS/CSS：合并、去重、延迟非关键 JS；Ticker 使用 transform 动画（避免 layout 抖动）。
+	•	监控：window.onerror 简单上报到控制台（后续接入 Sentry）。
+
+⸻
+
+9. 给 Claude 的一步到位执行顺序
+	1.	抽公共资源
+
+	•	创建 assets/css/app.css、assets/js/app.js，把首页/详情内联样式与脚本迁入；
+	•	实现组件：HeaderBar/StickyChips/PriceSwitch/Progress/Countdown/Ripple/Toast/Ticker/Stepper/Uploader；
+	•	所有页面统一引入上述资源。
+
+	2.	接入 Mock 数据
+
+	•	在 data/ 下建 countries.json / products.json / batches.json / orders.json / user.json；
+	•	app.js 内提供 fetchJson() & ctx（国家/语言/币种）管理；
+	•	首页、列表、详情依次改造成“数据驱动”。
+
+	3.	打通页面跳转
+
+	•	首页卡片 → 详情；详情 → 加入购物草稿（localStorage.cart）；
+	•	详情/列表 → 结账；结账 → TT 核验；核验 → 订单页；我的订单 → 订单页。
+
+	4.	实现 TT 三步与订单状态机
+
+	•	payment-verification.html：上传校验/预览/提交后刷新订单状态；
+	•	order-dashboard.html：根据状态渲染时间线与按钮（替换、下载、联系客服）。
+
+	5.	i18n & 货币
+
+	•	头部语言/国家切换；
+	•	所有价格节点类名统一 .js-price; 切换时批量刷新；
+	•	倒计时/Need/Joined 在切国家后也刷新。
+
+	6.	验收与小结
+
+	•	跑通“首购路径”：首页→详情→结账→TT→订单→我的订单；
+	•	运行 Lighthouse（本地）≥ 85；
+	•	写 docs/deviation-requests.md 记录与设计不一致处（若有）。
+
+⸻
+
+10. 你这边要给  的补充物料
+	•	设计真值：把我们最终确认的“首页/列表/详情/TT/订单”的截图放 docs/reference/，命名 home-final.png 等。
+	•	Logo：你提供的 logo 放 assets/img/logo.png，并在 HeaderBar 使用。
+	•	品牌色：黑金（#0b0d10 / #121418 / #1d232b / #d4af37 / #f5c044）。
+	•	国家开通表：先给 MX/EG/ID/NG/CO/PH 六个，其他留空即可。
+
+
+最后说明（给你 & 给 Claude）
+	•	这是一套**在你现有页面上“合并+提质”**的路线：不推翻样式，不另起组件库。
+	•	前端 Mock → 后端接口，只要字段/URL 保持本文的数据契约，切换成本非常低。
+	•	每做完一页，就按“页面职责 & 验收清单”自测一次；全部完成后跑一次“首购路径”回归测试。
+
